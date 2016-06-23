@@ -8,15 +8,18 @@ class plugboard:
         self.__maxPlugs = max_plugs
         self.__plugs = []
 
-    def get_plugs(self):
-        """Returns list of plugs is use."""
+    @property
+    def plugs(self):
+        """Returns list of currently used plugs"""
         return self.__plugs
 
-    def get_max(self):
+    @property
+    def max_plugs(self):
         """Returns the maximum number of plugs allowed."""
         return self.__maxPlugs
 
-    def get_available(self):
+    @property
+    def available_plugs(self):
         """Returns the number of plugs left available to use."""
         return (self.__maxPlugs - len(self.__plugs))
 
@@ -77,5 +80,5 @@ class plugboard:
 
     def __plugs_available_check(self, plugCount):
         """Check for plug availability"""
-        if plugCount > self.get_available():
+        if plugCount > self.available_plugs:
             raise enigma_exception.MaxPlugsReached()

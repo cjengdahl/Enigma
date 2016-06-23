@@ -92,8 +92,8 @@ class enigma:
         """
 
         for r in self.__rotors:
-            if self.__rotors[r].get_ID() == oldRotor:
-                self.__rotors[r].set_rotorId(newRotor)
+            if self.__rotors[r].rotorId == oldRotor:
+                self.__rotors[r].rotorId = newRotor
                 break
 
     def swap_reflect(self, newReflect):
@@ -105,7 +105,7 @@ class enigma:
 
         """
 
-        self.__rf.set_reflectorId(newReflect)
+        self.__rf.reflectorId = newReflect
 
     def step(self):
         """Increment rotors according to notches"""
@@ -114,10 +114,8 @@ class enigma:
         if self.__rotors[0].is_turnover() or self.__rotors[1].is_turnover():
             """account for double step"""
             queue.append(self.__rotors[1])
-            print("rotor 2 stepped")
         if self.__rotors[1].is_turnover():
             queue.append(self.__rotors[2])
-            print("rotor 3 stepped")
 
         for item in queue:
             item.step()
@@ -133,7 +131,6 @@ class enigma:
     def encrypt(self, letter):
         """pass a character through the machine"""
         self.step()
-        # print(self.__rotors[2].get_offset())
         start = ord(letter.upper()) - 65
         stage1 = self.__plugboard.encrypt(start)
         stage2 = self.__rotors[0].encrypt(stage1, 1)
@@ -158,24 +155,24 @@ class enigma:
         return chr(stage9 + 65)
 
 
-fast = [1, 1, 1]
-middle = [2, 1, 1]
-slow = [3, 1, 1]
-group  = 4
-count = 0
-rot = [fast, middle, slow]
-ref = "UKW-B"`
-rotors = []
-# plugs = ["AB", "CD", "EF", "GH", "IJ"]
-plugs = []
-e = enigma("ENIGMAI", rot, ref, plugs)
-name = "VVQIRDXPGVHOANLBVJHDUUATKLJKZAIDGJZFKYJGTCEBAFALUACFIWWXUQDDQUIDDHUIBVZRMYFHJFJZRCQGKNWKYWFUGDNQDNZTIXGOHSRQXYUMVKARXSXTURWVEAJZNIUTPQRGYVWQWGYAOLGHERIGVUTCDUQDPPXGPKOXUYREFATTXNKZTVEVWKQZMITQVMNDXFHEDLVQEKEUCDQTHIHFXWJZTUYYRQPGQLWXJKVMSTBXUZMQVBUNHYAIIOUXPQPYROHPDBROOROSLRAMAUOTFJSWQDFMOKOOLSPIBXWGWBFJEMDNJECGJLPBYIVAJADSMPSXUCZYCLPNMGHGLPCIRHUUIHBOUMFWECXWUNEBHUNWMBVCLEVLFFKASRZUQDWPFEXDDKFSPCRQTEIETFKZJJGWWTYHIRBLZQSKEBTRAHZNUECLRGAEAMYNBMUQHAOBDGATZRJHMIMEAEAYSCFZZWKBJTNYTPXVMQFHOZXDHAQKIOCQWCEKIPQFSETXPCPUPAQYKHLCEUFCLIPJJRKZSBQFUJLRIXZRCFKYSNPMECEICXLMVGCRXHYSBFAJMTHMURCROOAEYADJZOYFKUNYXPLSLPYHRIFZOWHJKERXYJDQUUTAQPFTMEACXZCVROYSSBBEPHNSIAKTAWOOZAPBUCDMDLQPQCNPHQOQZONNANSCNNBDLJNLCKHPEPOEQVAPYATAMLAQGOQUYFKVUGETUQUEUHEQKXFPACPKJXWKZ"
-result = ""
-for c in name:
-    if count == 0:
-        result = result + " "
+# fast = [1, 1, 1]
+# middle = [2, 1, 1]
+# slow = [3, 1, 1]
+# group  = 4
+# count = 0
+# rot = [fast, middle, slow]
+# ref = "UKW-B"
+# rotors = []
+# # plugs = ["AB", "CD", "EF", "GH", "IJ"]
+# plugs = []
+# e = enigma("ENIGMAI", rot, ref, plugs)
+# name = "VVQIRDXPGVHOANLBVJHDUUATKLJKZAIDGJZFKYJGTCEBAFALUACFIWWXUQDDQUIDDHUIBVZRMYFHJFJZRCQGKNWKYWFUGDNQDNZTIXGOHSRQXYUMVKARXSXTURWVEAJZNIUTPQRGYVWQWGYAOLGHERIGVUTCDUQDPPXGPKOXUYREFATTXNKZTVEVWKQZMITQVMNDXFHEDLVQEKEUCDQTHIHFXWJZTUYYRQPGQLWXJKVMSTBXUZMQVBUNHYAIIOUXPQPYROHPDBROOROSLRAMAUOTFJSWQDFMOKOOLSPIBXWGWBFJEMDNJECGJLPBYIVAJADSMPSXUCZYCLPNMGHGLPCIRHUUIHBOUMFWECXWUNEBHUNWMBVCLEVLFFKASRZUQDWPFEXDDKFSPCRQTEIETFKZJJGWWTYHIRBLZQSKEBTRAHZNUECLRGAEAMYNBMUQHAOBDGATZRJHMIMEAEAYSCFZZWKBJTNYTPXVMQFHOZXDHAQKIOCQWCEKIPQFSETXPCPUPAQYKHLCEUFCLIPJJRKZSBQFUJLRIXZRCFKYSNPMECEICXLMVGCRXHYSBFAJMTHMURCROOAEYADJZOYFKUNYXPLSLPYHRIFZOWHJKERXYJDQUUTAQPFTMEACXZCVROYSSBBEPHNSIAKTAWOOZAPBUCDMDLQPQCNPHQOQZONNANSCNNBDLJNLCKHPEPOEQVAPYATAMLAQGOQUYFKVUGETUQUEUHEQKXFPACPKJXWKZ"
+# result = ""
+# for c in name:
+#     if count == 0:
+#         result = result + " "
 
-    result = result + e.encrypt(c)
-    count = (count + 1) % group
+#     result = result + e.encrypt(c)
+#     count = (count + 1) % group
 
-print(result)
+# print(result)

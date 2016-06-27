@@ -35,7 +35,11 @@ class rotor:
 
         self.__baseWiring = list(rotor.config.get('Rotors', str(rotorId)))
         self.__wiring = self.__baseWiring
-        self.__turnover = list(rotor.config.get('Rotors', str(rotorId) + 'to'))
+        if not (self.__rotorId == 9 or self.__rotorId == 10):
+            self.__turnover = list(rotor.config.get('Rotors',
+                                                    str(rotorId) + 'to'))
+        else:
+            self.__turnover = None
         self.configure()
         self.count = 0
 
@@ -59,7 +63,11 @@ class rotor:
         self.__rotorId = rotorId
         self.__baseWiring = list(rotor.config.get('Rotors', str(rotorId)))
         self.__notchCount = rotor.config.getint('Rotors', str(rotorId) + "nn")
-        self.__turnover = list(rotor.config.get('Rotors', str(rotorId) + 'to'))
+        if not (self.__rotorId == 9 or self.__rotorId == 10):
+            self.__turnover = list(rotor.config.get('Rotors',
+                                                    str(rotorId) + 'to'))
+        else:
+            self.__turnover = None
         self.configure()
 
     @property

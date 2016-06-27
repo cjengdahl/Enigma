@@ -2,6 +2,7 @@ import configparser
 import rotor
 import reflect
 import plugboard
+import enigma_exception
 
 config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
@@ -32,9 +33,11 @@ class enigma:
         self.__rotors = []
         for r in range(0, len(rot)):
             a = rotor.rotor(rot[r][0], rot[r][1], rot[r][2])
+            self.__rotor_check(a)
             self.__rotors.append(a)
 
         # instantiate reflector
+        self.__reflector_check(ref)
         self.__reflect = reflect.reflect(ref)
 
         # instantiate plugboard
@@ -81,32 +84,6 @@ class enigma:
 
         self.__plugboard.remove_plug(plug)
 
-    def swap_rotor(self, newRotor, oldRotor):
-        """change one rotor for another
-
-        Arguments:
-
-        - newRotor: string containing rotor ID
-
-        - oldRotor: string containgin rotor ID
-        """
-
-        for r in self.__rotors:
-            if self.__rotors[r].rotorId == oldRotor:
-                self.__rotors[r].rotorId = newRotor
-                break
-
-    def swap_reflect(self, newReflect):
-        """change refelctor for another
-
-        Arguments:
-
-        - newReflect: string containing reflector ID
-
-        """
-
-        self.__rf.reflectorId = newReflect
-
     def step(self):
         """Increment rotors according to notches"""
         queue = [self.__rotors[0]]
@@ -137,7 +114,7 @@ class enigma:
         stage3 = self.__rotors[1].encrypt(stage2, 1)
         stage4 = self.__rotors[2].encrypt(stage3, 1)
 
-        # M4 has a four rotor
+        # M4 has a fourth rotor
         if(self.__model == 'M4'):
             stageX = self.__rotors[3].encrypt(stage4, 1)
             stage5 = self.__reflect.encrypt(stageX)
@@ -154,25 +131,46 @@ class enigma:
 
         return chr(stage9 + 65)
 
+    def __rotor_check(self, rotor):
+        """check for invalid or duplicate rotor"""
 
-# fast = [1, 1, 1]
-# middle = [2, 1, 1]
-# slow = [3, 1, 1]
-# group  = 4
-# count = 0
-# rot = [fast, middle, slow]
-# ref = "UKW-B"
-# rotors = []
-# # plugs = ["AB", "CD", "EF", "GH", "IJ"]
-# plugs = []
-# e = enigma("ENIGMAI", rot, ref, plugs)
-# name = "VVQIRDXPGVHOANLBVJHDUUATKLJKZAIDGJZFKYJGTCEBAFALUACFIWWXUQDDQUIDDHUIBVZRMYFHJFJZRCQGKNWKYWFUGDNQDNZTIXGOHSRQXYUMVKARXSXTURWVEAJZNIUTPQRGYVWQWGYAOLGHERIGVUTCDUQDPPXGPKOXUYREFATTXNKZTVEVWKQZMITQVMNDXFHEDLVQEKEUCDQTHIHFXWJZTUYYRQPGQLWXJKVMSTBXUZMQVBUNHYAIIOUXPQPYROHPDBROOROSLRAMAUOTFJSWQDFMOKOOLSPIBXWGWBFJEMDNJECGJLPBYIVAJADSMPSXUCZYCLPNMGHGLPCIRHUUIHBOUMFWECXWUNEBHUNWMBVCLEVLFFKASRZUQDWPFEXDDKFSPCRQTEIETFKZJJGWWTYHIRBLZQSKEBTRAHZNUECLRGAEAMYNBMUQHAOBDGATZRJHMIMEAEAYSCFZZWKBJTNYTPXVMQFHOZXDHAQKIOCQWCEKIPQFSETXPCPUPAQYKHLCEUFCLIPJJRKZSBQFUJLRIXZRCFKYSNPMECEICXLMVGCRXHYSBFAJMTHMURCROOAEYADJZOYFKUNYXPLSLPYHRIFZOWHJKERXYJDQUUTAQPFTMEACXZCVROYSSBBEPHNSIAKTAWOOZAPBUCDMDLQPQCNPHQOQZONNANSCNNBDLJNLCKHPEPOEQVAPYATAMLAQGOQUYFKVUGETUQUEUHEQKXFPACPKJXWKZ"
-# result = ""
-# for c in name:
-#     if count == 0:
-#         result = result + " "
+        """invalid rotor check"""
+        if (self.__model == "ENIGMAI" and
+           (rotor.rotorId < 1 or rotor.rotorId > 5)):
+            raise enigma_exception.InvalidRotor(self.__model)
 
-#     result = result + e.encrypt(c)
-#     count = (count + 1) % group
+        # Relying on rotor list length prevents check after added to list
+        elif ((self.__model == "M4") and len(self.__rotors) == 3 and
+              (rotor.rotorId < 9 or rotor.rotorId > 10)):
 
-# print(result)
+            raise enigma_exception.InvalidRotorFour()
+
+        elif (not (self.__model == "ENIGMAI") and len(self.__rotors) < 3 and
+              (rotor.rotorId < 1 or rotor.rotorId > 8)):
+
+            raise enigma_exception.InvalidRotor(self.__model)
+
+        """duplicate rotor check"""
+        ids = []
+        for r in self.__rotors:
+            ids.append(r.rotorId)
+
+        if rotor.rotorId in ids:
+            raise enigma_exception.DuplicateRotor(rotor)
+
+    def __reflector_check(self, reflect):
+        """check for invalid reflector"""
+        if self.__model == "ENIGMAI" and not(reflect == "UKW-A" or
+                                             reflect == "UKW-B" or
+                                             reflect == "UKW-C"):
+
+            raise enigma_exception.InvalidReflector(self.__model)
+
+        elif self.__model == "M4" and not(reflect == "UKW-B_THIN" or
+                                          reflect == "UKW-C_THIN"):
+            raise enigma_exception.InvalidReflector(self.__model)
+
+        elif (not (self.__model == "ENIGMAI" or self.__model == "M4") and
+              not (reflect == "UKW-B" or reflect == "UKW-C")):
+
+            raise enigma_exception.InvalidReflector(self.__model)

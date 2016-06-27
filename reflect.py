@@ -9,7 +9,6 @@ class reflect:
 
     def __init__(self, reflectId,):
         self.__reflectId = reflectId
-        # get reflector confguration
         self.config.read('model.ini')
         self.__wiring = list(reflect.config.get('Reflectors', reflectId))
 

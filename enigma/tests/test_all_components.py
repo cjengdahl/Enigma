@@ -9,7 +9,7 @@ class TestPlugboardMethods(unittest.TestCase):
 
     def setUp(self):
         # Instantiate pluboard with a supply of 10 plugs
-        self.p = plugboard.plugboard(10)
+        self.p = plugboard.Plugboard(10)
 
     def test_add(self):
 
@@ -103,31 +103,31 @@ class TestReflectorMethods(unittest.TestCase):
     def test_encrypt(self):
 
         # check encryption on "UKW-A"
-        r = reflect.reflect('UKW-A')
+        r = reflect.Reflect('UKW-A')
         ra = list("EJMZALYXVBWFCRQUONTSPIKHGD")
         for x in range(0, 26):
             self.assertEqual(r.encrypt(x), ord(ra[x]) - 65)
 
         # check encryption on "UKW-B"
-        r = reflect.reflect('UKW-B')
+        r = reflect.Reflect('UKW-B')
         rb = list("YRUHQSLDPXNGOKMIEBFZCWVJAT")
         for x in range(0, 26):
             self.assertEqual(r.encrypt(x), ord(rb[x]) - 65)
 
         # check encryption on "UKW-C"
-        r = reflect.reflect('UKW-C')
+        r = reflect.Reflect('UKW-C')
         rc = list("FVPJIAOYEDRZXWGCTKUQSBNMHL")
         for x in range(0, 26):
             self.assertEqual(r.encrypt(x), ord(rc[x]) - 65)
 
         # check encryption on "UKW-B-Thin"
-        r = reflect.reflect('UKW-B_thin')
+        r = reflect.Reflect('UKW-B_thin')
         rbt = list("ENKQAUYWJICOPBLMDXZVFTHRGS")
         for x in range(0, 26):
             self.assertEqual(r.encrypt(x), ord(rbt[x]) - 65)
 
         # check encryption on "UKW-C-Thin"
-        r = reflect.reflect('UKW-C_thin')
+        r = reflect.Reflect('UKW-C_thin')
         rct = list("RDOBJNTKVEHMLFCWZAXGYIPSUQ")
         for x in range(0, 26):
             self.assertEqual(r.encrypt(x), ord(rct[x]) - 65)
@@ -137,7 +137,7 @@ class TestRotorMethods(unittest.TestCase):
 
     # create rotor object
     def setUp(self):
-        self.r = rotor.rotor(1, 1, 1)
+        self.r = rotor.Rotor(1, 1, 1)
 
     def test_notches(self):
         # iterate through all positions of all roters

@@ -1,7 +1,7 @@
 import configparser
 
 
-class rotor:
+class Rotor:
     '''A single enigma rotor object'''
 
     config = configparser.ConfigParser(interpolation=configparser.
@@ -30,13 +30,13 @@ class rotor:
         self.__position = position - 1
         self.__ringSetting = ringSetting - 1
         self.__offset = None
-        self.__notchCount = rotor.config.getint('Rotors', str(rotorId) + "nn")
+        self.__notchCount = Rotor.config.getint('Rotors', str(rotorId) + "nn")
         self.__window = None
 
-        self.__baseWiring = list(rotor.config.get('Rotors', str(rotorId)))
+        self.__baseWiring = list(Rotor.config.get('Rotors', str(rotorId)))
         self.__wiring = self.__baseWiring
         if not (self.__rotorId == 9 or self.__rotorId == 10):
-            self.__turnover = list(rotor.config.get('Rotors',
+            self.__turnover = list(Rotor.config.get('Rotors',
                                                     str(rotorId) + 'to'))
         else:
             self.__turnover = None
@@ -61,10 +61,10 @@ class rotor:
         -rotor offset and wring reconfugred by call to configure() function
         """
         self.__rotorId = rotorId
-        self.__baseWiring = list(rotor.config.get('Rotors', str(rotorId)))
-        self.__notchCount = rotor.config.getint('Rotors', str(rotorId) + "nn")
+        self.__baseWiring = list(Rotor.config.get('Rotors', str(rotorId)))
+        self.__notchCount = Rotor.config.getint('Rotors', str(rotorId) + "nn")
         if not (self.__rotorId == 9 or self.__rotorId == 10):
-            self.__turnover = list(rotor.config.get('Rotors',
+            self.__turnover = list(Rotor.config.get('Rotors',
                                                     str(rotorId) + 'to'))
         else:
             self.__turnover = None

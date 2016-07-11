@@ -1,8 +1,8 @@
 import configparser
 
 
-class reflect:
-    '''This is the reflector component of an Enigma Machine'''
+class Reflect:
+    """This is the reflector component of an Enigma Machine"""
 
     config = configparser.ConfigParser(interpolation=configparser.
                                        ExtendedInterpolation())
@@ -10,7 +10,7 @@ class reflect:
     def __init__(self, reflectId,):
         self.__reflectId = reflectId
         self.config.read('model.ini')
-        self.__wiring = list(reflect.config.get('Reflectors', reflectId))
+        self.__wiring = list(Reflect.config.get('Reflectors', reflectId))
 
     @property
     def reflectId(self):
@@ -19,7 +19,7 @@ class reflect:
     @reflectId.setter
     def reflectId(self, reflectId):
         try:
-            self.__wiring = list(reflect.config.get('Reflectors', reflectId))
+            self.__wiring = list(Reflect.config.get('Reflectors', reflectId))
         except configparser.NoOptionError:
             print(reflectId + " is not a valid reflector ID.")
         return

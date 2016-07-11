@@ -27,7 +27,7 @@ def main():
     config.read('model.ini')
     model = user_config['model']
     model_config = {}
-	
+	¶
     model_config['max_rotors'] = ConfigSectionMap(model, 'max_rotors', 'configInt')
     model_config['max_plugs'] = ConfigSectionMap(model, 'max_plugs', 'configInt')
     model_config['rotors'] = ConfigSectionMap(model, 'rotors', 'configList')

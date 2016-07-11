@@ -1,4 +1,4 @@
-import enigma
+import enigma_machine
 import unittest
 import enigma_exception
 
@@ -20,7 +20,7 @@ class TestEnigmaMethods(unittest.TestCase):
             for y in range(9, 11):
                 rot[x][0] = y
                 with self.assertRaises(enigma_exception.InvalidRotor):
-                    self.e = enigma.enigma("M4", rot, ref, plugs)
+                    self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
             # reset rotors to ids 1,2,3
             rot[0][0] = 1
             rot[1][0] = 2
@@ -29,7 +29,7 @@ class TestEnigmaMethods(unittest.TestCase):
         for x in range(1, 9):
             rot[3][0] = x
             with self.assertRaises(enigma_exception.InvalidRotorFour):
-                self.e = enigma.enigma("M4", rot, ref, plugs)
+                self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
     def test_duplicate_rotor(self):
 
@@ -46,21 +46,21 @@ class TestEnigmaMethods(unittest.TestCase):
         rot[2][0] = 3
 
         with self.assertRaises(enigma_exception.DuplicateRotor):
-            self.e = enigma.enigma("M4", rot, ref, plugs)
+            self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         rot[0][0] = 1
         rot[1][0] = 2
         rot[2][0] = 2
 
         with self.assertRaises(enigma_exception.DuplicateRotor):
-            self.e = enigma.enigma("M4", rot, ref, plugs)
+            self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         rot[0][0] = 3
         rot[1][0] = 2
         rot[2][0] = 3
 
         with self.assertRaises(enigma_exception.DuplicateRotor):
-            self.e = enigma.enigma("M4", rot, ref, plugs)
+            self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
     def test_incorrect_reflector(self):
 
@@ -75,7 +75,7 @@ class TestEnigmaMethods(unittest.TestCase):
         options = ["UKW-A", "UKW-B", "UKW-C"]
         for ref in options:
             with self.assertRaises(enigma_exception.InvalidReflector):
-                self.e = enigma.enigma("M4", rot, ref, plugs)
+                self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
     # used for all encrtion tests
     plaintext = ("LOREMIPSUMDOLORSITAMETCONSECTETURADIPISCINGELITSEDD"
@@ -112,7 +112,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = []
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -121,7 +121,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -149,7 +149,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -158,7 +158,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -188,7 +188,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -197,7 +197,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -225,7 +225,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -234,7 +234,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -262,7 +262,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -271,7 +271,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -299,7 +299,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -308,7 +308,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -336,7 +336,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -345,7 +345,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -373,7 +373,7 @@ class TestEnigmaMethods(unittest.TestCase):
         rot = [fast, middle, slow, static]
         ref = "UKW-C_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         ciphertext = ""
         for c in self.plaintext:
             ciphertext = ciphertext + e.encrypt(c)
@@ -382,7 +382,7 @@ class TestEnigmaMethods(unittest.TestCase):
         self.assertEqual(crossRef, ciphertext)
 
         # restore initial settings
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
         original = ""
         for c in ciphertext:
@@ -403,8 +403,8 @@ class TestEnigmaMethods(unittest.TestCase):
         ref_M3 = "UKW-B"
         ref_M4 = "UKW-B_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e_M3 = enigma.enigma("M3", rot_M3, ref_M3, plugs)
-        e_M4 = enigma.enigma("M4", rot_M4, ref_M4, plugs)
+        e_M3 = enigma_machine.EnigmaMachine("M3", rot_M3, ref_M3, plugs)
+        e_M4 = enigma_machine.EnigmaMachine("M4", rot_M4, ref_M4, plugs)
         ciphertext_M3 = ""
         ciphertext_M4 = ""
         for c in self.plaintext:
@@ -426,8 +426,8 @@ class TestEnigmaMethods(unittest.TestCase):
         ref_M3 = "UKW-C"
         ref_M4 = "UKW-C_THIN"
         plugs = ["AK", "BC", "UD", "PI", "QX"]
-        e_M3 = enigma.enigma("M3", rot_M3, ref_M3, plugs)
-        e_M4 = enigma.enigma("M4", rot_M4, ref_M4, plugs)
+        e_M3 = enigma_machine.EnigmaMachine("M3", rot_M3, ref_M3, plugs)
+        e_M4 = enigma_machine.EnigmaMachine("M4", rot_M4, ref_M4, plugs)
         ciphertext_M3 = ""
         ciphertext_M4 = ""
         for c in self.plaintext:
@@ -446,7 +446,7 @@ class TestEnigmaMethods(unittest.TestCase):
         plugs = []
         ref = "UKW-B_THIN"
         rot = [fast, middle, slow, static]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         self.assertEqual("Z", e.encrypt('A'))
         self.assertEqual("U", e.encrypt('B'))
 
@@ -459,7 +459,7 @@ class TestEnigmaMethods(unittest.TestCase):
         plugs = []
         ref = "UKW-B_THIN"
         rot = [fast, middle, slow, static]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         self.assertEqual("G", e.encrypt('A'))
         self.assertEqual("Y", e.encrypt('B'))
 
@@ -470,7 +470,7 @@ class TestEnigmaMethods(unittest.TestCase):
         plugs = []
         ref = "UKW-B_THIN"
         rot = [fast, middle, slow, static]
-        e = enigma.enigma("M4", rot, ref, plugs)
+        e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
         self.assertEqual("G", e.encrypt('A'))
         self.assertEqual("Y", e.encrypt('B'))
 

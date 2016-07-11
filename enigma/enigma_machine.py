@@ -8,7 +8,7 @@ config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
 
 
-class enigma:
+class EnigmaMachine:
     """Enigma Machine"""
 
     def __init__(self, model, rot, ref, plugs):
@@ -32,16 +32,16 @@ class enigma:
         # instantiate rotors
         self.__rotors = []
         for r in range(0, len(rot)):
-            a = rotor.rotor(rot[r][0], rot[r][1], rot[r][2])
+            a = rotor.Rotor(rot[r][0], rot[r][1], rot[r][2])
             self.__rotor_check(a)
             self.__rotors.append(a)
 
         # instantiate reflector
         self.__reflector_check(ref)
-        self.__reflect = reflect.reflect(ref)
+        self.__reflect = reflect.Reflect(ref)
 
         # instantiate plugboard
-        self.__plugboard = plugboard.plugboard(10)
+        self.__plugboard = plugboard.Plugboard(10)
         self.add_many_plugs(plugs)
 
     def add_plug(self, plug):

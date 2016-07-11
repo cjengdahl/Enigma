@@ -1,7 +1,7 @@
 import enigma_exception
 
 
-class plugboard:
+class Plugboard:
     """This is a the plugboard component of an Enigma Machine"""
 
     def __init__(self, max_plugs):

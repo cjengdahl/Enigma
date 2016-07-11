@@ -1,0 +1,93 @@
+-----------------------------------------------------------
+   Engima Manchine Command-line Interface
+-----------------------------------------------------------
+
+ # current issue #
+
+ after running pip install -e .
+ and attempt to run enimga,
+
+ the interpreter cann't seem to find cli.  
+ From what I can tell, I did everthing the same way that 
+ the dude in the video did.  My sturcutre may be screwing things up
+
+
+ at least I figured out how to clean up my virtual enviorments
+
+ Things to rememver
+
+ pip runs the system default pip
+ to check default, pip --version
+
+ to be safe, run pip2 or pip3 if not in virtual enviorment
+
+ to activate virtual enviorment, source ENVIR_NAME/bin/activate while in project
+ -exiting the terminal deactivates
+
+ Look into creating gitigore file to prevent version contol on virtual enviorment
+
+
+
+Todo:
+
+- Determine the purpose of each file
+	- Config Files
+	- Added Features
+	- Driver
+- Determine how the files should be structured
+	- Directories and sub-directories
+	- setup.py file
+	- README
+
+
+Driver:
+- Facilitate the enigma via Command-line
+	- Command-line Flags
+		- o (output)
+		- v (verbose)
+		- i (interactive mode)
+	-Sub Commands
+	    - Configure
+	        - temp/permanent flag that either changes config file or parameters already loaded
+
+	- by default the messages will be taken as the first and only argument
+		- output will be displayed in console
+
+	- the user may choose to specifiy an input file, for which an output file
+	  with either be appended, or created
+
+	- the user can invoke a configuration change (model, rotors, reflector, plugboard, etc)
+		- invoked change can either be permanant (change config file) or
+		  temporary, changing the setting in an instantiation
+
+	- the user can specify how plaintext is process
+		- invoked change either be permanant or temporary
+			- how spaces and illegal characters are processed
+
+
+Procedure:
+
+User types enigma as first argument (command)
+
+
+The enigma module is envoked, and the cli() method is called.  If the next argument (command) is not
+configure or a flag, than the default configuration of the enigma is used, instantiated from the config file using configParser
+
+
+flags are proceed as such
+
+-o will specify that the session will be encrypted with to an output file, which must be indicated
+-f will specify that the seesion will be encrypted from an input file
+-i will specify that the session will take place in interactive mode
+-v will turn on verbose
+
+-x will replace spaces with 'x' in plaintext, before encryption (cannot be used with k
+-k will keep spaces in place (cannot be used with x, or g )
+-g specifies character grouping, default 5 (cannot be used with k)
+
+
+
+
+
+
+

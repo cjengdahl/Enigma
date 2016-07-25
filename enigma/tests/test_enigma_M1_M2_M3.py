@@ -1,6 +1,6 @@
-import enigma_machine
 import unittest
-import enigma_exception
+from enigma import enigma_machine
+from enigma import enigma_exception
 
 
 class TestEnigmaMethods(unittest.TestCase):

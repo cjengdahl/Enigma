@@ -1,8 +1,8 @@
 import configparser
-import rotor
-import reflect
-import plugboard
-import enigma_exception
+from enigma import rotor
+from enigma import reflect
+from enigma import plugboard
+from enigma import enigma_exception
 
 config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
@@ -14,7 +14,7 @@ class EnigmaMachine:
     def __init__(self, model, rot, ref, plugs):
         """Assembly of Enigma Machine
 
-        Arguments:
+        Arguments:`
 
         -model: string containing the Enigma Machine war model
 

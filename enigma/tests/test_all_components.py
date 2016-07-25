@@ -1,8 +1,8 @@
-import plugboard
-import reflect
-import rotor
 import unittest
-import enigma_exception
+from enigma import plugboard
+from enigma import reflect
+from enigma import rotor
+from enigma import enigma_exception
 
 
 class TestPlugboardMethods(unittest.TestCase):

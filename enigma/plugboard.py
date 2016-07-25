@@ -1,4 +1,4 @@
-import enigma_exception
+from enigma import enigma_exception
 
 
 class Plugboard:

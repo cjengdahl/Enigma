@@ -9,7 +9,7 @@ class Reflect:
 
     def __init__(self, reflectId,):
         self.__reflectId = reflectId
-        self.config.read('model.ini')
+        self.config.read('enigma/model.ini')
         self.__wiring = list(Reflect.config.get('Reflectors', reflectId))
 
     @property

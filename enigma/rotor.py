@@ -24,7 +24,7 @@ class Rotor:
 
         """
         # get rotor confguration
-        self.config.read('model.ini')
+        self.config.read('enigma/model.ini')
 
         self.__rotorId = rotorId
         self.__position = position - 1

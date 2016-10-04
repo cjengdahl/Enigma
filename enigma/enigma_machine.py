@@ -42,7 +42,8 @@ class EnigmaMachine:
 
         # instantiate plugboard
         self.__plugboard = plugboard.Plugboard(10)
-        self.add_many_plugs(plugs)
+        if len(plugs) > 1:
+            self.add_many_plugs(plugs)
 
     def add_plug(self, plug):
         """add specified plug, if not already present

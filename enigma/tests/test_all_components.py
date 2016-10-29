@@ -150,7 +150,7 @@ class TestRotorMethods(unittest.TestCase):
         self.r = rotor.Rotor(1, 1, 1)
 
     def test_notches(self):
-        # iterate through all positions of all roters
+        # iterate through all positions of all rotors
 
         # cross check against notch count of rotor
         self.r.ringSetting = 1

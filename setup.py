@@ -19,7 +19,7 @@ setup(
     # CLI module
     py_modules=['enigma_driver'],
 
-    # Include addtional files with package
+    # Include additional files with package
     include_package_data=True,
 
     # Details

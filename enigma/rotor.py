@@ -1,8 +1,9 @@
 import configparser
+import os
 
 
 class Rotor:
-    '''A single enigma rotor object'''
+    """A single enigma rotor object"""
 
     config = configparser.ConfigParser(interpolation=configparser.
                                        ExtendedInterpolation())
@@ -16,15 +17,20 @@ class Rotor:
         -position: an integer (1-26) or character (A-Z) identifying
         the starting rotor position
 
-        -ringSetting: an integer (1-26) or character (A-Z) indentifying
+        -ringSetting: an integer (1-26) or character (A-Z) identifying
         the starting ring setting
 
         Side effects:
 
 
         """
-        # get rotor confguration
-        self.config.read('enigma/model.ini')
+
+        # set relative path to config file
+        pwd = os.path.dirname(__file__)
+        model_config = os.path.join(pwd, 'model.ini')
+
+        # get rotor configuration
+        self.config.read(model_config)
 
         self.__rotorId = rotorId
         self.__position = position - 1
@@ -50,15 +56,15 @@ class Rotor:
 
     @rotorId.setter
     def rotorId(self, rotorId):
-        """set rotor ID, effectivly changing it's wiring
+        """set rotor ID, effectively changing it's wiring
 
         Arguments:
-        -rotorID: a integer identifing active rotor from a set
+        -rotorID: a integer identifying active rotor from a set
 
         Side effects:
         -rotorID changed
         -base wiring of rotor set to newly assigned rotor ID
-        -rotor offset and wring reconfugred by call to configure() function
+        -rotor offset and wring reconfigured by call to configure() function
         """
         self.__rotorId = rotorId
         self.__baseWiring = list(Rotor.config.get('Rotors', str(rotorId)))
@@ -116,8 +122,8 @@ class Rotor:
         return self.__turnover
 
     def is_turnover(self):
-        turnover = chr((self.__position) + 65)
-        return (turnover in self.__turnover)
+        turnover = chr(self.__position + 65)
+        return turnover in self.__turnover
 
     @property
     def window(self):
@@ -141,7 +147,7 @@ class Rotor:
         """increment the rotor one position
 
         Side effects:
-        -rotor postion increased by one
+        -rotor position increased by one
         -rotor offset and wiring reconfigured by call to configure() function
         """
 
@@ -156,8 +162,8 @@ class Rotor:
         -None
 
         Side effects:
-        -rotor postion increased by one
-        -rotor offset and wiring reconfigred by call to configure() function
+        -rotor position increased by one
+        -rotor offset and wiring reconfigured by call to configure() function
         """
 
         self.__position -= 1
@@ -180,8 +186,8 @@ class Rotor:
 
         if traverse == 1:
             if self.__rotorId == 1:
-                self.count = self.count + 1
-            return ((ord(self.__wiring[letter]) - 65) - self.__offset % 26)
+                self.count =+ 1
+            return (ord(self.__wiring[letter]) - 65) - self.__offset % 26
         else:
             return self.__wiring.index(chr(((letter +
                                        self.__offset) % 26) + 65))

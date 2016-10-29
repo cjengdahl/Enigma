@@ -161,7 +161,7 @@ class TestEnigmaMethods(unittest.TestCase):
 
     def test_encrypt_start_positions(self):
 
-        # test case 3 (psuedo random start positions)
+        # test case 3 (pseudo random start positions)
 
         crossRef = ("RCLJKRMGRENHTFVDUNYKUVTLHRIVZCXWKWERUODYLITBQJEXUZB"
                     "WQFOXPRAFLJOSPBGQTXQAIZGSEZTYFKRQCGJDGDAIEMEGCWJVLPHFP"
@@ -197,7 +197,7 @@ class TestEnigmaMethods(unittest.TestCase):
 
     def test_encrypt_ring_settings(self):
 
-        # test case 4 (psuedo random ring settings)
+        # test case 4 (pseudo random ring settings)
 
         crossRef = ("HQDOTZQRZZELCKEPOVXJFJYAHECMJRZTUVAUFGEOKUFIBEHQMUQ"
                     "LSXOIYEEWABZXGDCEALKIZQNVZWXDCQWVVSSNLBSITAXCXHJYVIMHK"
@@ -372,8 +372,6 @@ class TestEnigmaMethods(unittest.TestCase):
         e = enigma_machine.EnigmaMachine("M3", rot, ref, plugs)
         self.assertEqual("G", e.encrypt('A'))
         self.assertEqual("Y", e.encrypt('B'))
-
-
 
 if __name__ == '__main__':
     unittest.main()

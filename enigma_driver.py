@@ -13,8 +13,9 @@ import os
 config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
 
-dir = os.path.dirname(__file__)
-user_configs = os.path.join(dir, '/config/config.ini')
+pwd = os.path.dirname(__file__)
+user_configs = os.path.join(pwd, 'config/config.ini')
+
 
 class DecryptAlias(click.Group):
 
@@ -49,7 +50,7 @@ def list(configuration):
     Lists the existing user configurations
     """
 
-    if len(config.read('config/config.ini')) == 0:
+    if len(config.read(user_configs)) == 0:
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
@@ -76,7 +77,6 @@ def list(configuration):
             click.echo("%s: %s" % (component[0], component[1]))
         click.echo("\n")
 
-
     else:
         click.echo("\nAvailable Configurations:\n")
         sections = config.sections()
@@ -86,29 +86,29 @@ def list(configuration):
                 click.echo(section)
         click.echo("\n")
 
+
 @cli.command()
-@click.option('--input', type=click.STRING, help= 'set default input directory path spreference')
-@click.option('--output', type=click.STRING, help= 'set default output directory path preference')
-@click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help= 'set default space handling preference')
-@click.option('--group', type=click.STRING, help= 'set default letter grouping preference')
-@click.option('--remember', type=click.Choice(['Yes', 'No']), help='set enigma machine to remember machine state after encryption')
+@click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help='set default space handling preference')
+@click.option('--group', type=click.STRING, help='set default letter grouping preference')
+@click.option('--remember', type=click.Choice(['Yes', 'No']),
+              help='set enigma machine to remember machine state after encryption')
 def pref(input, output, spaces, group, remember):
     """
     Lists the default preferences.  Invoked options updates preferences
     """
 
-    if len(config.read('config/config.ini')) == 0:
+    if len(config.read(user_configs)) == 0:
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
-    options = ['input', 'output', 'spaces', 'group', 'remember']
+    options = ['spaces', 'group', 'remember']
     updated_options = {}
     for option in options:
         if eval(option) is not None:
             updated_options[option] = eval(option)
 
     if len(updated_options) != 0:
-         # update preferences
+        # update preferences
         write_config("Preferences", updated_options)
         click.echo("\nPreferences updated\n")
 
@@ -148,7 +148,8 @@ def pref(input, output, spaces, group, remember):
                                                 '  For example:  \'5,21,19\'')
 @click.option('--static', type=click.STRING, help='specify rotor id (9 for beta, 10 for gamma), position (1-26), '
                                                   'and ring setting (1-26)    For example:\'1,20,12\'')
-@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']), help='specify what enigma reflector to use')
+@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']),
+              help='specify what enigma reflector to use')
 @click.option('--plugs', type=click.STRING, help='specify what plugs to include on plugboard'
                                                  '  For example: \'AB,DY,UI,QK\'')
 @click.argument('configuration', type=click.STRING, required=True)
@@ -162,12 +163,12 @@ def new(configuration, model, fast, middle, slow, static, reflect, plugs):
         click.echo("Cannot create configuration, M4 model requires static rotor and thin reflector")
         return
 
-
     # load default
     local_config = load_config('Default')
 
     # add changes locally
-    options = {'model': model, 'fast': fast, 'middle': middle, 'slow':  slow, 'static': static, 'reflect': reflect, 'plugs': plugs}
+    options = {'model': model, 'fast': fast, 'middle': middle, 'slow':  slow, 'static': static, 'reflect': reflect,
+               'plugs': plugs}
     local_config = update_config(local_config, options)
 
     # assembly enigma machine
@@ -206,7 +207,7 @@ def clear():
     Clears all users configurations except 'Default' and 'User'
     """
 
-    config.read('config/config.ini')
+    config.read(user_configs)
 
     for x in config.sections():
         if x.upper() not in ['DEFAULT', 'USER', 'PREFERENCES']:
@@ -215,7 +216,7 @@ def clear():
     # set config preference to User
     config["Preferences"]["config"] = "User"
 
-    with open('config/config.ini', 'w') as configfile:
+    with open(user_configs, 'w') as configfile:
             config.write(configfile)
 
 
@@ -227,7 +228,7 @@ def delete(configuration):
     can not be deleted
     """
 
-    if len(config.read('config/config.ini')) == 0:
+    if len(config.read(user_configs)) == 0:
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
@@ -260,7 +261,7 @@ def delete(configuration):
                 # update config preference to be User config
                 config["Preferences"]["config"] = "User"
 
-            with open('config/config.ini', 'w') as configfile:
+            with open('user_configs', 'w') as configfile:
                 config.write(configfile)
     else:
         click.echo("\nCannot delete \"Default\" or \"User\" configurations\n")
@@ -273,7 +274,7 @@ def reset(configuration):
     Resets specified configuration to \"Default\" settings
     """
 
-    if len(config.read('config/config.ini')) == 0:
+    if len(config.read(user_configs)) == 0:
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
@@ -297,12 +298,11 @@ def reset(configuration):
             config[configuration] = {}
             for x in config.options('Default'):
                 config[configuration][x] = config['Default'][x]
-            with open('config/config.ini', 'w') as configfile:
+            with open(user_configs, 'w') as configfile:
                 config.write(configfile)
 
     else:
         click.echo("\nCannot reset \"Default\" configuration\n")
-
 
 
 @cli.command()
@@ -316,7 +316,8 @@ def reset(configuration):
 @click.option('--slow', '-r3', type=click.STRING, help='specify rotor id, position, and ring setting')
 @click.option('--static', '-r4', type=click.STRING, help='specify rotor id, position, and ring setting.'
               '(only applicable for M4 mode)')
-@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']), help='specify what enigma reflector to use')
+@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']),
+              help='specify what enigma reflector to use')
 @click.option('--plugs', type=click.STRING, help='specify what plugs to include on plugboard')
 # config management options
 @click.option('--select', help='configuration to load')
@@ -327,13 +328,14 @@ def reset(configuration):
 @click.option('--output', '-o', type=click.File('w'), required=False)
 # arguments
 @click.argument('message', type=click.STRING, required=False)
-def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message, input, output):
+def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message,
+            input, output):
     """
     Command Line Interface tool for Enigma Machine
     """
 
     # get user configurations
-    if len(config.read('config/config.ini')) == 0:
+    if len(config.read(user_configs)) == 0:
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
@@ -359,7 +361,9 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
         return
 
     # add config changes locally
-    options = {'model': model, 'fast': fast, 'middle': middle, 'slow':  slow, 'static': static, 'reflect': reflect, 'plugs': plugs}
+    options = {'model': model, 'fast': fast, 'middle': middle, 'slow':  slow, 'static': static, 'reflect': reflect,
+               'plugs': plugs}
+
     local_config = update_config(local_config, options)
 
     # add preferences locally
@@ -402,13 +406,11 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
     group = int(preferences["group"])
     remember = preferences["remember"]
 
-
     if message is None and input is not None:
             message = input.read().replace('\n', '')
 
     # encrypt message
     ciphertext = _encrypt(enigma, message, spaces, group)
-
 
     # todo: modify enigma_machine to report state
     # save state of machine for next use, if requested
@@ -425,7 +427,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
         config[select]["r3_p"] = str(r3_p)
 
         # write changes
-        with open('config/config.ini', 'w') as configfile:
+        with open(user_configs, 'w') as configfile:
             config.write(configfile)
 
         pass
@@ -453,7 +455,7 @@ def _encrypt(enigma, message, spaces, group):
     :return:
     """
 
-    #todo:  notification of some sort....
+    # todo:  notification of some sort....
 
     if message is None:
         return
@@ -495,6 +497,7 @@ def _encrypt(enigma, message, spaces, group):
                     ciphertext += " "
     return ciphertext
 
+
 def update_config(local_config, changes):
     """
     Updates local config dict with changes from cli invoked options
@@ -502,7 +505,6 @@ def update_config(local_config, changes):
     :param changes (dict) : changes to be made to loaded configuration, where key = component, value = desired setting
     :return (dict): loaded configuration with new changes from invoked cli options
     """
-
 
     for key, value in changes.items():
         if value is not None:
@@ -534,6 +536,7 @@ def update_config(local_config, changes):
 
     return local_config
 
+
 def load_config(config_name):
     """
     Loads the options and values of an existing configurations into a dictionary
@@ -541,7 +544,7 @@ def load_config(config_name):
     :return (dict/bool) : dictionary of components
     """
 
-    config.read('config/config.ini')
+    config.read(user_configs)
         
     components = {}
 
@@ -564,7 +567,7 @@ def load_config(config_name):
 
 def write_config(config_name, local_config):
     """
-    Writes locally stored config file to to initiailizeation (.ini) file
+    Writes locally stored config file to to initialization (.ini) file
     :param config_name (str): name of config section to write (i.e. name of configuration)
     :param local_config (dic) : dict of locally stored enigma configuration
     :return:
@@ -590,7 +593,7 @@ def write_config(config_name, local_config):
             config[config_name][component[0]] = str(component[1])
 
     # write the changes
-    with open('config/config.ini', 'w') as configfile:
+    with open(user_configs, 'w') as configfile:
 
         config.write(configfile)
 
@@ -599,7 +602,7 @@ def assemble_enigma(components):
     """
     Assembles enigma machine from local config dict
     :param components (dict): local config file.  key = component, value = setting
-    :return (enimga_machine):
+    :return (enigma_machine):
     """
     # assemble rotors from config file
     r1 = [components['r1_id'], components['r1_p'], components['r1_rs']]

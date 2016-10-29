@@ -45,18 +45,6 @@ class EnigmaMachine:
         if len(plugs) > 1:
             self.add_many_plugs(plugs)
 
-    def add_plug(self, plug):
-        """add specified plug, if not already present
-
-        Arguments:
-
-        - plug: string of 2 characters
-
-        Side Effects:
-
-        - plug added to plugboard
-        """
-
     def add_many_plugs(self, plugs):
         """add many plugs, if not already present
 
@@ -116,7 +104,7 @@ class EnigmaMachine:
         stage4 = self.__rotors[2].encrypt(stage3, 1)
 
         # M4 has a fourth rotor
-        if(self.__model == 'M4'):
+        if self.__model == 'M4':
             stageX = self.__rotors[3].encrypt(stage4, 1)
             stage5 = self.__reflect.encrypt(stageX)
             stageY = self.__rotors[3].encrypt(stage5, 2)
@@ -140,7 +128,6 @@ class EnigmaMachine:
             return self.__rotors[1].position
         if rotor == "r3":
             return self.__rotors[2].position
-
 
     def __rotor_check(self, rotor):
         """check for invalid or duplicate rotor"""

@@ -85,7 +85,6 @@ class Plugboard:
             if for_plug[0] in list(pair) or for_plug[1] in list(pair):
                 raise enigma_exception.DuplicatePlug(plug)
 
-
     def __plugs_available_check(self, plugCount):
         """Check for plug availability"""
         if plugCount > self.available_plugs:

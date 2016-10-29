@@ -132,6 +132,16 @@ class EnigmaMachine:
 
         return chr(stage9 + 65)
 
+    def rotor_pos(self, rotor):
+        """returns the current position of indicated rotor"""
+        if rotor == "r1":
+            return self.__rotors[0].position
+        if rotor == "r2":
+            return self.__rotors[1].position
+        if rotor == "r3":
+            return self.__rotors[2].position
+
+
     def __rotor_check(self, rotor):
         """check for invalid or duplicate rotor"""
 

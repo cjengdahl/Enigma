@@ -1,16 +1,20 @@
 __author__ = "Cory J. Engdahl"
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "0.1.0"
 __email__ = "cjengdahl@gmail.com"
 
 from enigma import enigma_machine
+from enigma import enigma_exception
 import configparser
 import click
+import os
 
 # instantiate config parser
 config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
 
+dir = os.path.dirname(__file__)
+user_configs = os.path.join(dir, '/config/config.ini')
 
 class DecryptAlias(click.Group):
 
@@ -45,28 +49,93 @@ def list(configuration):
     Lists the existing user configurations
     """
 
-    config.read('enigma/config.ini')
+    if len(config.read('config/config.ini')) == 0:
+        click.echo("\nConfig file, \"config.ini\", not found\n")
+        return
 
     if configuration is not None:
         # load config
-        selected = load_config(configuration)
-        click.echo("Configuration %s could not be found" % configuration)
+        try:
+            selected = load_config(configuration)
+
+        except configparser.NoSectionError:
+            click.echo("Configuration %s could not be found" % configuration)
+            return
 
         sorted_config = []
 
         # convert dict to list
         for key, value in selected.items():
             sorted_config.append([key, value])
-            return
 
         # sort
         sorted_config.sort(key=lambda x: x[0])
 
+        click.echo("\n%s:\n" % configuration)
         for component in sorted_config:
             click.echo("%s: %s" % (component[0], component[1]))
+        click.echo("\n")
+
 
     else:
-        click.echo(config.sections())
+        click.echo("\nAvailable Configurations:\n")
+        sections = config.sections()
+        for section in sections:
+            # preferences is not a config
+            if section.upper() != 'PREFERENCES':
+                click.echo(section)
+        click.echo("\n")
+
+@cli.command()
+@click.option('--input', type=click.STRING, help= 'set default input directory path spreference')
+@click.option('--output', type=click.STRING, help= 'set default output directory path preference')
+@click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help= 'set default space handling preference')
+@click.option('--group', type=click.STRING, help= 'set default letter grouping preference')
+@click.option('--remember', type=click.Choice(['Yes', 'No']), help='set enigma machine to remember machine state after encryption')
+def pref(input, output, spaces, group, remember):
+    """
+    Lists the default preferences.  Invoked options updates preferences
+    """
+
+    if len(config.read('config/config.ini')) == 0:
+        click.echo("\nConfig file, \"config.ini\", not found\n")
+        return
+
+    options = ['input', 'output', 'spaces', 'group', 'remember']
+    updated_options = {}
+    for option in options:
+        if eval(option) is not None:
+            updated_options[option] = eval(option)
+
+    if len(updated_options) != 0:
+         # update preferences
+        write_config("Preferences", updated_options)
+        click.echo("\nPreferences updated\n")
+
+    # list all preferences
+    else:
+        try:
+            selected = load_config("Preferences")
+
+        except configparser.NoSectionError:
+            click.echo("Preferences could not be found")
+            return
+
+        preferences = []
+
+        # convert dict to list
+        for key, value in selected.items():
+            preferences.append([key, value])
+
+        # sort
+        preferences.sort(key=lambda x: x[0])
+
+        click.echo("\nPreferences:\n")
+        for pref in preferences:
+            click.echo("%s: %s" % (pref[0], pref[1]))
+        click.echo("\n")
+
+        return
 
 
 @cli.command()
@@ -79,165 +148,287 @@ def list(configuration):
                                                 '  For example:  \'5,21,19\'')
 @click.option('--static', type=click.STRING, help='specify rotor id (9 for beta, 10 for gamma), position (1-26), '
                                                   'and ring setting (1-26)    For example:\'1,20,12\'')
-@click.option('--reflect', type=click.Choice(['UWK-A', 'UWK-B', 'UWK-C']), help='specify what enigma reflector to use')
+@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']), help='specify what enigma reflector to use')
 @click.option('--plugs', type=click.STRING, help='specify what plugs to include on plugboard'
                                                  '  For example: \'AB,DY,UI,QK\'')
-@click.argument('new', type=click.STRING, required=True)
-def new(new, model, fast, middle, slow, static, reflect, plugs):
+@click.argument('configuration', type=click.STRING, required=True)
+def new(configuration, model, fast, middle, slow, static, reflect, plugs):
     """
     Creates and saves new user configuration for enigma machine.  New configuration is based on default configuration
     overwritten with invoked options.
     """
 
+    if model == "M4" and (static is None or reflect is None):
+        click.echo("Cannot create configuration, M4 model requires static rotor and thin reflector")
+        return
+
+
     # load default
-    local_config = load_config('User')
+    local_config = load_config('Default')
 
     # add changes locally
     options = {'model': model, 'fast': fast, 'middle': middle, 'slow':  slow, 'static': static, 'reflect': reflect, 'plugs': plugs}
     local_config = update_config(local_config, options)
 
     # assembly enigma machine
-    # todo: handle exceptions
-    enigma = assemble_enigma(local_config)
+    try:
+        enigma = assemble_enigma(local_config)
+
+    except enigma_exception.DuplicatePlug:
+        click.echo("Cannot create configuration, duplicate plugs are not allowed")
+        return
+    except enigma_exception.MaxPlugsReached:
+        click.echo("Cannot create configuration.  More plugs than allowed have been specified")
+        return
+    except enigma_exception.DuplicateRotor:
+        click.echo("Cannot create configuration, duplicate rotors are not allowed")
+        return
+    except enigma_exception.InvalidRotor:
+        click.echo("Cannot create configuration, invalid rotor specified")
+        return
+    except enigma_exception.InvalidRotorFour:
+        click.echo("Cannot create configuration, invalid static rotor specified.  "
+                   "Must use rotor id 9 (Beta) or 10 (Gamma)")
+        return
+    except enigma_exception.InvalidReflector:
+        click.echo("Cannot create configuration, invalid reflector specified")
+        return
 
     # create new config and write local configuration to it
-    config[new] = {}
-    write_config(new, local_config)
+    config[configuration] = {}
+    write_config(configuration, local_config)
 
 
 @cli.command()
 def clear():
     """
+
     Clears all users configurations except 'Default' and 'User'
     """
 
-    config.read('enigma/config.ini')
+    config.read('config/config.ini')
 
     for x in config.sections():
-        if x.upper() not in ['DEFAULT', 'USER']:
+        if x.upper() not in ['DEFAULT', 'USER', 'PREFERENCES']:
             config.remove_section(x)
-        with open('enigma/config.ini', 'w') as configfile:
+
+    # set config preference to User
+    config["Preferences"]["config"] = "User"
+
+    with open('config/config.ini', 'w') as configfile:
             config.write(configfile)
 
 
 @cli.command()
-@click.argument('delete', type=click.STRING, required=True)
-def delete(delete):
+@click.argument('configuration', type=click.STRING, required=True)
+def delete(configuration):
     """
     Deletes specified user configurations. Default and User configs
     can not be deleted
-    :param delete:
-    :return:
     """
 
-    config.read('enigma/config.ini')
+    if len(config.read('config/config.ini')) == 0:
+        click.echo("\nConfig file, \"config.ini\", not found\n")
+        return
 
-    if delete.upper() not in ['DEFAULT', 'USER']:
+    if configuration.upper() not in ['DEFAULT', 'USER']:
+
+        if configuration.upper() == "PREFERENCES":
+            click.echo("\nConfiguration \"%s\" does not exist, cannot delete\n" % configuration)
+            return
 
         # gather all configurations
         configurations = []
-        for x in config.sections():
-            configurations.append(x.upper())
+        sections = config.sections()
+        
+        if len(sections) == 3:
+            click.echo("\nConfiguration file contains no delete-able configurations\n")
+            return
 
-        if delete.upper() not in configurations:
-            click.echo("Error: configuration \"%s\" does not exist, cannot delete" %delete)
+        for x in sections:
+            configurations.append(x)
+
+        if configuration not in configurations:
+            click.echo("Configuration \"%s\" does not exist, cannot delete" % configuration)
 
         else:
-            config.remove_section(delete)
-            with open('enigma/config.ini', 'w') as configfile:
+            # remove config
+            config.remove_section(configuration)
+
+            # if config to be deleted is config preference
+            if config["Preferences"]["config"] == configuration:
+                # update config preference to be User config
+                config["Preferences"]["config"] = "User"
+
+            with open('config/config.ini', 'w') as configfile:
                 config.write(configfile)
     else:
-        click.echo("Error: Cannot delete \"Default\" and \"User\" configurations")
+        click.echo("\nCannot delete \"Default\" or \"User\" configurations\n")
 
 
 @cli.command()
-@click.argument('reset', type=click.STRING, required=True)
-def reset(reset):
+@click.argument('configuration', type=click.STRING, required=True)
+def reset(configuration):
     """
     Resets specified configuration to \"Default\" settings
-    :param reset:
-    :return:
     """
 
-    config.read('enigma/config.ini')
+    if len(config.read('config/config.ini')) == 0:
+        click.echo("\nConfig file, \"config.ini\", not found\n")
+        return
 
-    if reset.upper() != 'DEFAULT':
+    if configuration.upper() != 'DEFAULT':
         # gather all configurations
         configurations = []
-        for x in config.sections():
+        sections = config.sections()
+        
+        if len(sections) == 0:
+            click.echo("\nConfiguration file contains no configurations\n")
+            return
+
+        for x in sections:
             configurations.append(x.upper())
 
-        if reset.upper() not in configurations:
-            click.echo("Error: configuration \"%s\" does not exist, cannot reset" % reset)
+        if (configuration.upper() not in configurations) or configuration.upper() == "PREFERENCES":
+            click.echo("\nconfiguration \"%s\" does not exist, cannot reset\n" % configuration)
 
         else:
-            config.remove_section(reset)
-            config[reset] = {}
+            config.remove_section(configuration)
+            config[configuration] = {}
             for x in config.options('Default'):
-                config[reset][x] = config['Default'][x]
-            with open('enigma/config.ini', 'w') as configfile:
+                config[configuration][x] = config['Default'][x]
+            with open('config/config.ini', 'w') as configfile:
                 config.write(configfile)
 
     else:
-        click.echo("Error: Cannot reset \"Default\" configuration")
+        click.echo("\nCannot reset \"Default\" configuration\n")
 
 
 
 @cli.command()
 # formatting options
-@click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), default='remove', help='specify how to handle spaces')
-@click.option('--group', '-g', default=5, help='number of characters per output grouping')
+@click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='specify how to handle spaces')
+@click.option('--group', '-g', help='number of characters per output grouping')
 # enigma setting options
 @click.option('--model', type=click.STRING, help='specify enigma machine model')
 @click.option('--fast', '-r1', type=click.STRING, help='specify rotor id, position, and ring setting')
 @click.option('--middle', '-r2', type=click.STRING, help='specify rotor id, position, and ring setting')
 @click.option('--slow', '-r3', type=click.STRING, help='specify rotor id, position, and ring setting')
 @click.option('--static', '-r4', type=click.STRING, help='specify rotor id, position, and ring setting.'
-                                                  '(only applicable for M4 mode)')
-@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C']), help='specify what enigma reflector to use')
+              '(only applicable for M4 mode)')
+@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']), help='specify what enigma reflector to use')
 @click.option('--plugs', type=click.STRING, help='specify what plugs to include on plugboard')
 # config management options
-@click.option('--select', default='User', help='configuration to load')
-@click.option('--once', is_flag=True, help='do not save changes to initial setup')
+@click.option('--select', help='configuration to load')
+@click.option('--update', '-u', is_flag=True, help='overwrite config file with invoked preference and component option')
 @click.option('--remember', is_flag=True, help='save state (position) of rotors after encryption')
 # input/output options
 @click.option('--input', '-f', type=click.File('r'), required=False)
 @click.option('--output', '-o', type=click.File('w'), required=False)
 # arguments
 @click.argument('message', type=click.STRING, required=False)
-def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, once, remember, message, input, output):
+def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message, input, output):
     """
     Command Line Interface tool for Enigma Machine
     """
 
     # get user configurations
-    config.read('enigma/config.ini')
+    if len(config.read('config/config.ini')) == 0:
+        click.echo("\nConfig file, \"config.ini\", not found\n")
+        return
+
+    # load preferences
+    try:
+        preferences = load_config("Preferences")
+
+    except configparser.NoSectionError:
+        click.echo("Preferences could not be found" % select)
+        return
 
     # load model
-    local_config = load_config(select)
+    try:
 
-    # add changes locally
+        if select is None:
+            # load config in preferences
+            select = preferences["config"]
+
+        local_config = load_config(select)
+
+    except configparser.NoSectionError:
+        click.echo("Configuration %s could not be found" % select)
+        return
+
+    # add config changes locally
     options = {'model': model, 'fast': fast, 'middle': middle, 'slow':  slow, 'static': static, 'reflect': reflect, 'plugs': plugs}
     local_config = update_config(local_config, options)
 
+    # add preferences locally
+    pref_options = {'spaces': spaces, 'group': group, 'remember': remember,
+                    'config': select}
+
+    preferences = update_config(preferences, pref_options)
+
     # assembly enigma machine
-    # todo: handle exceptions
-    enigma = assemble_enigma(local_config)
+    try:
+        enigma = assemble_enigma(local_config)
 
-    # if enigma assembled without error, write config
-    if not once:
+    except enigma_exception.DuplicatePlug:
+        click.echo("Cannot create configuration, duplicate plugs are not allowed")
+        return
+    except enigma_exception.MaxPlugsReached:
+        click.echo("Cannot create configuration.  More plugs than allowed have been specified")
+        return
+    except enigma_exception.DuplicateRotor:
+        click.echo("Cannot create configuration, duplicate rotors are not allowed")
+        return
+    except enigma_exception.InvalidRotor:
+        click.echo("Cannot create configuration, invalid rotor specified")
+        return
+    except enigma_exception.InvalidRotorFour:
+        click.echo("Cannot create configuration, invalid static rotor specified")
+        return
+    except enigma_exception.InvalidReflector:
+        click.echo("Cannot create configuration, invalid reflector specified, check model compatibility")
+        return
+
+    # if enigma assembled without error and update is specified, write config and preferences to config file
+    if update:
         write_config(select, local_config)
+        write_config("Preferences", preferences)
 
-    # todo: modify enigma_machine to report state
-    # save state of machine for next use, if requested
-    if remember and not once:
-        pass
+    # match preference options to local preferences
+    spaces = preferences["spaces"]
+    # todo: add input validation?
+    group = int(preferences["group"])
+    remember = preferences["remember"]
+
 
     if message is None and input is not None:
             message = input.read().replace('\n', '')
 
     # encrypt message
     ciphertext = _encrypt(enigma, message, spaces, group)
+
+
+    # todo: modify enigma_machine to report state
+    # save state of machine for next use, if requested
+    if remember:
+
+        # get position of rotors 1-3 and write to config file
+        r1_p = enigma.rotor_pos("r1")
+        r2_p = enigma.rotor_pos("r2")
+        r3_p = enigma.rotor_pos("r3")
+
+        # replace value in config file
+        config[select]["r1_p"] = str(r1_p)
+        config[select]["r2_p"] = str(r2_p)
+        config[select]["r3_p"] = str(r3_p)
+
+        # write changes
+        with open('config/config.ini', 'w') as configfile:
+            config.write(configfile)
+
+        pass
 
     # print cipher
     if output is not None:
@@ -261,6 +452,11 @@ def _encrypt(enigma, message, spaces, group):
     natural state.  All input must be upper case, or it will not be encrypted.
     :return:
     """
+
+    #todo:  notification of some sort....
+
+    if message is None:
+        return
 
     plaintext = message.upper()
     ciphertext = ""
@@ -307,6 +503,7 @@ def update_config(local_config, changes):
     :return (dict): loaded configuration with new changes from invoked cli options
     """
 
+
     for key, value in changes.items():
         if value is not None:
             if key == 'fast':
@@ -344,19 +541,14 @@ def load_config(config_name):
     :return (dict/bool) : dictionary of components
     """
 
-    config.read('enigma/config.ini')
-
-    # # todo: check if config exists
-    # if not config_name in config:
-    #     # indicate error and close program
-    #     click.echo("%s is not a valid configuration" %config_name)
+    config.read('config/config.ini')
         
     components = {}
 
     # load all components and convert rotor parameters to integer
     for x in config.options(config_name):
         if x in ['r1_id', 'r2_id', 'r3_id', 'r4_id', 'r1_p', 'r2_p', 'r3_p', 'r4_p',
-                                      'r1_rs', 'r2_rs', 'r3_rs', 'r4_rs']:
+                 'r1_rs', 'r2_rs', 'r3_rs', 'r4_rs']:
             value = int(config[config_name][x])
         elif x == 'plugs':
             value = config[config_name][x].split(",")
@@ -368,6 +560,7 @@ def load_config(config_name):
         components[x] = value
 
     return components
+
 
 def write_config(config_name, local_config):
     """
@@ -383,7 +576,7 @@ def write_config(config_name, local_config):
     for key, value in local_config.items():
         sorted_config.append([key, value])
 
-    #sort
+    # sort
     sorted_config.sort(key=lambda x: x[0])
 
     for component in sorted_config:
@@ -397,7 +590,7 @@ def write_config(config_name, local_config):
             config[config_name][component[0]] = str(component[1])
 
     # write the changes
-    with open('enigma/config.ini', 'w') as configfile:
+    with open('config/config.ini', 'w') as configfile:
 
         config.write(configfile)
 

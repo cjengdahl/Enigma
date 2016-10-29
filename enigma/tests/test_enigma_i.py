@@ -3,8 +3,6 @@ from enigma import enigma_machine
 from enigma import enigma_exception
 
 
-
-
 class TestEnigmaMethods(unittest.TestCase):
 
     def test_incorrect_rotor(self):

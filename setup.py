@@ -2,17 +2,45 @@ from setuptools import setup
 
 
 setup(
+
+    # Application name
     name='EnigmaMachine',
+
+    # Version Number
+    version="0.1.0",
+
+    # Author details
     author='cjengdahl',
     author_email='cjengdahl@gmail.com',
-    version='0.1',
-    py_modules=['enigma_driver'],
+
+    # Packages
     packages=['enigma'],
+
+    # CLI module
+    py_modules=['enigma_driver'],
+
+    # Include addtional files with package
+    include_package_data=True,
+
+    # Details
+    # Put pypi url here
+
+    license="LICENSE.txt",
+
+    description="German Encryption Machine",
+
+    long_description=open("README.txt").read(),
+
+    # Dependent packages
     install_requires=[
         'Click',
     ],
+
+    # Executable information
     entry_points='''
         [console_scripts]
         enigma=enigma_driver:cli
     '''
+
+
 )

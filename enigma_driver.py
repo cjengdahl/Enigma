@@ -90,9 +90,9 @@ def list(configuration):
 @cli.command()
 @click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help='set default space handling preference')
 @click.option('--group', type=click.STRING, help='set default letter grouping preference')
-@click.option('--remember', type=click.Choice(['Yes', 'No']),
+@click.option('--remember', type=click.Choice(['True', 'False']),
               help='set enigma machine to remember machine state after encryption')
-def pref(input, output, spaces, group, remember):
+def pref(spaces, group, remember):
     """
     Lists the default preferences.  Invoked options updates preferences
     """
@@ -322,7 +322,7 @@ def reset(configuration):
 # config management options
 @click.option('--select', help='configuration to load')
 @click.option('--update', '-u', is_flag=True, help='overwrite config file with invoked preference and component option')
-@click.option('--remember', is_flag=True, help='save state (position) of rotors after encryption')
+@click.option('--remember', type=click.Choice(['True', 'False']), help='save state (position) of rotors after encryption')
 # input/output options
 @click.option('--input', '-f', type=click.File('r'), required=False)
 @click.option('--output', '-o', type=click.File('w'), required=False)
@@ -404,7 +404,10 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
     spaces = preferences["spaces"]
     # todo: add input validation?
     group = int(preferences["group"])
-    remember = preferences["remember"]
+
+    if remember is None:
+        remember = preferences["remember"]
+
 
     if message is None and input is not None:
             message = input.read().replace('\n', '')
@@ -414,7 +417,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # todo: modify enigma_machine to report state
     # save state of machine for next use, if requested
-    if remember:
+    if str_to_bool(remember):
 
         # get position of rotors 1-3 and write to config file
         r1_p = enigma.rotor_pos("r1")
@@ -429,8 +432,6 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
         # write changes
         with open(user_configs, 'w') as configfile:
             config.write(configfile)
-
-        pass
 
     # print cipher
     if output is not None:
@@ -621,4 +622,16 @@ def assemble_enigma(components):
     return e
 
 
+def str_to_bool(string):
+    """
+    Converts strings to boolean
+    :param string (str): string to convert
+    : retrun (bool): True if string is equal to "True", False if equal to "False"
+    """
 
+    if string == "True":
+        return True
+    elif string == "False":
+        return False
+    else:
+        return string

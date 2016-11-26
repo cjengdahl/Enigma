@@ -1,4 +1,5 @@
 import configparser
+import os
 
 
 class Reflect:
@@ -8,8 +9,14 @@ class Reflect:
                                        ExtendedInterpolation())
 
     def __init__(self, reflectId,):
+
+        # set relative path to config file
+        pwd = os.path.dirname(__file__)
+        model_config = os.path.join(pwd, 'model.ini')
+
+
         self.__reflectId = reflectId
-        self.config.read('model.ini')
+        self.config.read(model_config)
         self.__wiring = list(Reflect.config.get('Reflectors', reflectId))
 
     @property
@@ -22,12 +29,12 @@ class Reflect:
             self.__wiring = list(Reflect.config.get('Reflectors', reflectId))
         except configparser.NoOptionError:
             print(reflectId + " is not a valid reflector ID.")
-        return
         self.__reflectId = reflectId
+        return
 
     @property
     def wiring(self):
-        """Return the refector wiring."""
+        """Return the reflector wiring."""
         return self.__wiring
 
     def encrypt(self, letter):

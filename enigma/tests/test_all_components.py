@@ -1,8 +1,8 @@
-import plugboard
-import reflect
-import rotor
 import unittest
-import enigma_exception
+from enigma import plugboard
+from enigma import reflect
+from enigma import rotor
+from enigma import enigma_exception
 
 
 class TestPlugboardMethods(unittest.TestCase):
@@ -37,14 +37,24 @@ class TestPlugboardMethods(unittest.TestCase):
         with self.assertRaises(enigma_exception.DuplicatePlug):
             self.p.add_plug(p2)
 
-        # top of the plugboard
-        p3 = "ST"
-        self.p.add_plug(p3)
+        # add self plug
+        p3 = "ZZ"
+        with self.assertRaises(enigma_exception.DuplicatePlug):
+            self.p.add_plug(p3)
+
+        # add duplicate socket
+        p4 = "AZ"
+        with self.assertRaises(enigma_exception.DuplicatePlug):
+            self.p.add_plug(p4)
+
+        # top off the plugboard
+        p5 = "ST"
+        self.p.add_plug(p5)
 
         # add one to many
-        p4 = "YZ"
+        p6 = "YZ"
         with self.assertRaises(enigma_exception.MaxPlugsReached):
-            self.p.add_plug(p4)
+            self.p.add_plug(p6)
 
     def test_add_all(self):
 
@@ -140,7 +150,7 @@ class TestRotorMethods(unittest.TestCase):
         self.r = rotor.Rotor(1, 1, 1)
 
     def test_notches(self):
-        # iterate through all positions of all roters
+        # iterate through all positions of all rotors
 
         # cross check against notch count of rotor
         self.r.ringSetting = 1

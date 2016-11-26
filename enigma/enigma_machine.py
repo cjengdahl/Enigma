@@ -1,8 +1,8 @@
 import configparser
-import rotor
-import reflect
-import plugboard
-import enigma_exception
+from enigma import rotor
+from enigma import reflect
+from enigma import plugboard
+from enigma import enigma_exception
 
 config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
@@ -14,7 +14,7 @@ class EnigmaMachine:
     def __init__(self, model, rot, ref, plugs):
         """Assembly of Enigma Machine
 
-        Arguments:
+        Arguments:`
 
         -model: string containing the Enigma Machine war model
 
@@ -42,19 +42,8 @@ class EnigmaMachine:
 
         # instantiate plugboard
         self.__plugboard = plugboard.Plugboard(10)
-        self.add_many_plugs(plugs)
-
-    def add_plug(self, plug):
-        """add specified plug, if not already present
-
-        Arguments:
-
-        - plug: string of 2 characters
-
-        Side Effects:
-
-        - plug added to plugboard
-        """
+        if len(plugs) > 1:
+            self.add_many_plugs(plugs)
 
     def add_many_plugs(self, plugs):
         """add many plugs, if not already present
@@ -115,7 +104,7 @@ class EnigmaMachine:
         stage4 = self.__rotors[2].encrypt(stage3, 1)
 
         # M4 has a fourth rotor
-        if(self.__model == 'M4'):
+        if self.__model == 'M4':
             stageX = self.__rotors[3].encrypt(stage4, 1)
             stage5 = self.__reflect.encrypt(stageX)
             stageY = self.__rotors[3].encrypt(stage5, 2)
@@ -130,6 +119,15 @@ class EnigmaMachine:
         stage9 = self.__plugboard.encrypt(stage8)
 
         return chr(stage9 + 65)
+
+    def rotor_pos(self, rotor):
+        """returns the current position of indicated rotor"""
+        if rotor == "r1":
+            return self.__rotors[0].position
+        if rotor == "r2":
+            return self.__rotors[1].position
+        if rotor == "r3":
+            return self.__rotors[2].position
 
     def __rotor_check(self, rotor):
         """check for invalid or duplicate rotor"""

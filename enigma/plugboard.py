@@ -1,4 +1,4 @@
-import enigma_exception
+from enigma import enigma_exception
 
 
 class Plugboard:
@@ -21,7 +21,7 @@ class Plugboard:
     @property
     def available_plugs(self):
         """Returns the number of plugs left available to use."""
-        return (self.__maxPlugs - len(self.__plugs))
+        return self.__maxPlugs - len(self.__plugs)
 
     def add_plug(self, plug):
         """Add the a specified plug, if not already present."""
@@ -75,8 +75,15 @@ class Plugboard:
         """Check for duplicate plugs"""
         for_plug = list(plug)
         rev_plug = [for_plug[1], for_plug[0]]
-        if (for_plug in self.__plugs) or (rev_plug in self.__plugs):
+
+        # check if plug plugs into self
+        if for_plug[0] == for_plug[1]:
             raise enigma_exception.DuplicatePlug(plug)
+
+        # check for duplicate sockets are used
+        for pair in self.__plugs:
+            if for_plug[0] in list(pair) or for_plug[1] in list(pair):
+                raise enigma_exception.DuplicatePlug(plug)
 
     def __plugs_available_check(self, plugCount):
         """Check for plug availability"""

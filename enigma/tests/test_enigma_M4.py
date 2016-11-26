@@ -1,6 +1,6 @@
-import enigma_machine
 import unittest
-import enigma_exception
+from enigma import enigma_machine
+from enigma import enigma_exception
 
 
 class TestEnigmaMethods(unittest.TestCase):
@@ -77,15 +77,7 @@ class TestEnigmaMethods(unittest.TestCase):
             with self.assertRaises(enigma_exception.InvalidReflector):
                 self.e = enigma_machine.EnigmaMachine("M4", rot, ref, plugs)
 
-    # used for all encrtion tests
-    plaintext = ("LOREMIPSUMDOLORSITAMETCONSECTETURADIPISCINGELITSEDD"
-                 "OEIUSMODTEMPORINCIDIDUNTUTLABOREETDOLOREMAGNAALIQUAUTE"
-                 "NIMADMINIMVENIAMQUISNOSTRUDEXERCITATIONULLAMCOLABORISN"
-                 "ISIUTALIQUIPEXEACOMMODOCONSEQUATDUISAUTEIRUREDOLORINRE"
-                 "PREHENDERITINVOLUPTATEVELITESSECILLUMDOLOREEUFUGIATNUL"
-                 "LAPARIATUREXCEPTEURSINTOCCAECATCUPIDATATNONPROIDENTSUN"
-                 "TINCULPAQUIOFFICIADESERUNTMOLLITANIMIDESTLABORUM")
-
+    # used for all encryption tests
     plaintext = ("LOREMIPSUMDOLORSITAMETCONSECTETURADIPISCINGELITSEDD"
                  "OEIUSMODTEMPORINCIDIDUNTUTLABOREETDOLOREMAGNAALIQUAUTE"
                  "NIMADMINIMVENIAMQUISNOSTRUDEXERCITATIONULLAMCOLABORISN"
@@ -169,7 +161,7 @@ class TestEnigmaMethods(unittest.TestCase):
 
     def test_encrypt_start_positions(self):
 
-        # test case 3 (psuedo random start positions)
+        # test case 3 (pseudo random start positions)
 
         crossRef = ("MEYJZTOQPGIHEZIODBVKCPAGUMMQSYXCFTRWKUCDLGHYFFCINOO"
                     "IHVTONWSVJCODFEBDTHWOVVWHPEPZCAURGURZYCLAHMTQEQYJFMVBA"
@@ -208,7 +200,7 @@ class TestEnigmaMethods(unittest.TestCase):
 
     def test_encrypt_ring_settings(self):
 
-        # test case 4 (psuedo random ring settings)
+        # test case 4 (pseudo random ring settings)
 
         crossRef = ("XSVCNOXUDAXRVVIJCOUXIJEJZKJJQURLYVSLTVXRTDPQAPJEURU"
                     "BSHHESLUBHLVABRGFSAQIVIQTGSSEZAOAYYDCAPHDWISIRHMVREOFR"
@@ -391,7 +383,7 @@ class TestEnigmaMethods(unittest.TestCase):
         # check for proper decryption
         self.assertEqual(self.plaintext, original)
 
-    def test_compatability_beta(self):
+    def test_compatibility_beta(self):
 
         fast = [1, 4, 21]
         middle = [2, 19, 8]
@@ -411,10 +403,10 @@ class TestEnigmaMethods(unittest.TestCase):
             ciphertext_M3 = ciphertext_M3 + e_M3.encrypt(c)
             ciphertext_M4 = ciphertext_M4 + e_M4.encrypt(c)
 
-        # check for proper encryption compatabiltiy
+        # check for proper encryption compatibility
         self.assertEqual(ciphertext_M3, ciphertext_M4)
 
-    def test_compatabiltiy_gamma(self):
+    def test_compatibility_gamma(self):
 
         fast = [1, 4, 21]
         middle = [2, 19, 8]

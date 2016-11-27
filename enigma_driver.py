@@ -89,10 +89,11 @@ def list(configuration):
 
 @cli.command()
 @click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help='set default space handling preference')
+@click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='enable space detection, decrypted Xs are converted to spaces.')
 @click.option('--group', type=click.STRING, help='set default letter grouping preference')
 @click.option('--remember', type=click.Choice(['True', 'False']),
               help='set enigma machine to remember machine state after encryption')
-def pref(spaces, group, remember):
+def pref(spaces, group, remember, space_detect):
     """
     Lists the default preferences.  Invoked options updates preferences
     """
@@ -101,10 +102,10 @@ def pref(spaces, group, remember):
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
-    options = ['spaces', 'group', 'remember']
+    options = ['spaces', 'group', 'remember', 'space_detect']
     updated_options = {}
     for option in options:
-        if eval(option) is not None:
+        if eval(option) is not None:              
             updated_options[option] = eval(option)
 
     if len(updated_options) != 0:
@@ -308,6 +309,7 @@ def reset(configuration):
 @cli.command()
 # formatting options
 @click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='specify how to handle spaces')
+@click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='enable space detection, decrypted Xs are converted to spaces.')
 @click.option('--group', '-g', help='number of characters per output grouping')
 # enigma setting options
 @click.option('--model', type=click.STRING, help='specify enigma machine model')
@@ -329,7 +331,7 @@ def reset(configuration):
 # arguments
 @click.argument('message', type=click.STRING, required=False)
 def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message,
-            input, output):
+            input, output, space_detect):
     """
     Command Line Interface tool for Enigma Machine
     """
@@ -368,7 +370,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # add preferences locally
     pref_options = {'spaces': spaces, 'group': group, 'remember': remember,
-                    'config': select}
+                    'config': select, 'space_detect': space_detect}
 
     preferences = update_config(preferences, pref_options)
 
@@ -402,18 +404,19 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # match preference options to local preferences
     spaces = preferences["spaces"]
-    # todo: add input validation?
+
     group = int(preferences["group"])
+    remember = preferences["remember"]
+    space_detect = preferences["space_detect"]  
 
-    if remember is None:
-        remember = preferences["remember"]
-
+    # ensure type
+    space_detect = str_to_bool(space_detect)
 
     if message is None and input is not None:
-            message = input.read().replace('\n', '')
+            message = input.read().replace('\n', ' ')
 
     # encrypt message
-    ciphertext = _encrypt(enigma, message, spaces, group)
+    ciphertext = _encrypt(enigma, message, spaces, space_detect, group)
 
     # todo: modify enigma_machine to report state
     # save state of machine for next use, if requested
@@ -446,7 +449,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 ##################################
 
 
-def _encrypt(enigma, message, spaces, group):
+def _encrypt(enigma, message, spaces, space_detect, group):
     """
     Encrypts input and directs output appropriately, with standard-out as
     the default. It also controls output format.  By default, characters
@@ -457,6 +460,11 @@ def _encrypt(enigma, message, spaces, group):
     """
 
     # todo:  notification of some sort....
+
+    # if space_detect, remove all spaces for processing
+    if space_detect:
+        spaces = "remove"
+        group = 0
 
     if message is None:
         return
@@ -490,7 +498,12 @@ def _encrypt(enigma, message, spaces, group):
 
         # otherwise character is legal, encrypt it
         else:
-            ciphertext += enigma.encrypt(c)
+            e = enigma.encrypt(c)
+            # if space detect enabled, replaces Xs with spaces
+            if space_detect and e == 'X':
+                ciphertext += " "
+            else:
+                ciphertext += e
             if group != 0:
                 count = (count + 1) % group
                 # if not keeping spaces, group characters for readability

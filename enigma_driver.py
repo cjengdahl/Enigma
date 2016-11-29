@@ -48,7 +48,7 @@ def cli():
 @click.argument("configuration", type=click.STRING, required=False)
 def list(configuration):
     """
-    Lists the existing user configurations
+    Lists the existing user configurations.
     """
 
     if len(config.read(user_configs)) == 0:
@@ -89,15 +89,14 @@ def list(configuration):
 
 
 @cli.command()
-@click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help='set default space handling preference')
-@click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='enable space detection, decrypted Xs are converted to spaces.')
-@click.option('--group', type=click.STRING, help='set default letter grouping preference')
-@click.option('--select', help='configuration to load')
-@click.option('--remember', type=click.Choice(['True', 'False']),
-              help='set enigma machine to remember machine state after encryption')
+@click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='Set space handling preference')
+@click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='Convert decrypted Xs to spaces')
+@click.option('--group', '-g', type=click.STRING, help='Set output letter grouping')
+@click.option('--select', '-c', help='Select enigma machine configuration')
+@click.option('--remember', '-k', type=click.Choice(['True', 'False']), help='Remember machine state after encryption')
 def pref(spaces, group, remember, space_detect, select):
     """
-    Lists the default preferences.  Invoked options updates preferences
+    Manages the default preferences.  Invoked options updates preferences
     """
 
     if len(config.read(user_configs)) == 0:
@@ -142,19 +141,13 @@ def pref(spaces, group, remember, space_detect, select):
 
 
 @cli.command()
-@click.option('--model', type=click.Choice(['EnigmaI', 'M2', 'M3', 'M4']), help='specify enigma machine model')
-@click.option('--fast', type=click.STRING, help='specify rotor id (1-8) , position (1-26), and ring setting (1-26)'
-                                                '  For example:  \'1,20,12\'')
-@click.option('--middle', type=click.STRING, help='specify rotor id (1-8) , position (1-26), and ring setting (1-26)'
-                                                  '  For example:  \'2,25,7\'')
-@click.option('--slow', type=click.STRING, help='specify rotor id (1-8) , position (1-26), and ring setting (1-26)'
-                                                '  For example:  \'5,21,19\'')
-@click.option('--static', type=click.STRING, help='specify rotor id (9 for beta, 10 for gamma), position (1-26), '
-                                                  'and ring setting (1-26)    For example:\'1,20,12\'')
-@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']),
-              help='specify what enigma reflector to use')
-@click.option('--plugs', type=click.STRING, help='specify what plugs to include on plugboard'
-                                                 '  For example: \'AB,DY,UI,QK\'')
+@click.option('--model', '-m', type=click.Choice(['EnigmaI', 'M2', 'M3', 'M4']), help='Enigma machine model')
+@click.option('--fast', '-r1', type=click.STRING, help='Fast rotor config: id (1-8) , position (1-26), and ring setting (1-26)')
+@click.option('--middle', '-r2', type=click.STRING, help='Middle rotor config: id (1-8) , position (1-26), and ring setting (1-26)')
+@click.option('--slow', '-r3', type=click.STRING, help='Slow rotor config: id (1-8) , position (1-26), and ring setting (1-26)')
+@click.option('--static', '-r4', type=click.STRING, help='Static rotor config: (9 for beta, 10 for gamma), position (1-26), and ring setting (1-26)')
+@click.option('--reflect', '-r', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']), help='Enigma reflector')
+@click.option('--plugs', '-p', type=click.STRING, help='Plugs inserted in plugboard (e.g. "AB,XY")')
 @click.argument('configuration', type=click.STRING, required=True)
 def new(configuration, model, fast, middle, slow, static, reflect, plugs):
     """
@@ -207,7 +200,7 @@ def new(configuration, model, fast, middle, slow, static, reflect, plugs):
 def clear():
     """
 
-    Clears all users configurations except 'Default' and 'User'
+    Clears all users configurations with the exception of 'Default' and 'User'.
     """
 
     config.read(user_configs)
@@ -227,7 +220,7 @@ def clear():
 @click.argument('configuration', type=click.STRING, required=True)
 def delete(configuration):
     """
-    Deletes specified user configurations. Default and User configs
+    Deletes specified user configuration. Default and User configs
     can not be deleted
     """
 
@@ -274,7 +267,7 @@ def delete(configuration):
 @click.argument('configuration', type=click.STRING, required=True)
 def reset(configuration):
     """
-    Resets specified configuration to \"Default\" settings
+    Resets specified configuration to \"Default\" settings.
     """
 
     if len(config.read(user_configs)) == 0:
@@ -310,32 +303,30 @@ def reset(configuration):
 
 @cli.command()
 # formatting options
-@click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='specify how to handle spaces')
-@click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='enable space detection, decrypted Xs are converted to spaces.')
-@click.option('--group', '-g', help='number of characters per output grouping')
+@click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='Set space handling preference')
+@click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='Convert decrypted Xs to spaces')
+@click.option('--group', '-g', help='Set output letter grouping')
 # enigma setting options
-@click.option('--model', type=click.STRING, help='specify enigma machine model')
-@click.option('--fast', '-r1', type=click.STRING, help='specify rotor id, position, and ring setting')
-@click.option('--middle', '-r2', type=click.STRING, help='specify rotor id, position, and ring setting')
-@click.option('--slow', '-r3', type=click.STRING, help='specify rotor id, position, and ring setting')
-@click.option('--static', '-r4', type=click.STRING, help='specify rotor id, position, and ring setting.'
-              '(only applicable for M4 mode)')
-@click.option('--reflect', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']),
-              help='specify what enigma reflector to use')
-@click.option('--plugs', type=click.STRING, help='specify what plugs to include on plugboard')
+@click.option('--model', '-m', type=click.STRING, help='Enigma machine model')
+@click.option('--fast', '-r1', type=click.STRING, help='Fast rotor config: id (1-8) , position (1-26), and ring setting (1-26)')
+@click.option('--middle', '-r2', type=click.STRING, help='Middle rotor config: id (1-8) , position (1-26), and ring setting (1-26)')
+@click.option('--slow', '-r3', type=click.STRING, help='Slow rotor config: id (1-8) , position (1-26), and ring setting (1-26)')
+@click.option('--static', '-r4', type=click.STRING, help='Static rotor config: (9 for beta, 10 for gamma), position (1-26), and ring setting (1-26)')
+@click.option('--reflect', '-r', type=click.Choice(['UKW-A', 'UKW-B', 'UKW-C', 'UKW-B_THIN', 'UKW-C_THIN']), help='Enigma reflector')
+@click.option('--plugs', '-p', type=click.STRING, help='Plugs inserted in plugboard (e.g. "AB,XY")')
 # config management options
-@click.option('--select', help='configuration to load')
-@click.option('--update', '-u', is_flag=True, help='overwrite config file with invoked preference and component option')
-@click.option('--remember', type=click.Choice(['True', 'False']), help='save state (position) of rotors after encryption')
+@click.option('--select', '-c', help='Select enigma machine configuration')
+@click.option('--update', '-u', is_flag=True, help='Overwrite config file with invoked preferences, and options')
+@click.option('--remember', '-k', type=click.Choice(['True', 'False']), help='Remember machine state after encryption')
 # input/output options
-@click.option('--input', '-f', type=click.File('r'), required=False)
-@click.option('--output', '-o', type=click.File('w'), required=False)
+@click.option('--input', '-f', type=click.File('r'), required=False, help="Path to input file")
+@click.option('--output', '-o', type=click.File('w'), required=False, help="Path to output file")
 # arguments
 @click.argument('message', type=click.STRING, required=False)
-def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message,
-            input, output, space_detect):
+def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message, input, output, space_detect):
     """
-    Command Line Interface tool for Enigma Machine
+    Encrypts text input with Enigma Machine.  All input is converted to uppercase and non-alphabetic characters (with the exception
+    of spaces and newline characters) are removed.  
     """
 
     # get user configurations

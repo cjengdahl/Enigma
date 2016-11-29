@@ -90,11 +90,12 @@ def list(configuration):
 
 @cli.command()
 @click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='Set space handling preference')
+@click.option('--newlines', '-n', type=click.Choice(['True', 'False']), help='Include newline characters')
 @click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='Convert decrypted Xs to spaces')
 @click.option('--group', '-g', type=click.STRING, help='Set output letter grouping')
 @click.option('--select', '-c', help='Select enigma machine configuration')
 @click.option('--remember', '-k', type=click.Choice(['True', 'False']), help='Remember machine state after encryption')
-def pref(spaces, group, remember, space_detect, select):
+def pref(spaces, group, remember, space_detect, select, newlines):
     """
     Manages the default preferences.  Invoked options updates preferences
     """
@@ -103,7 +104,7 @@ def pref(spaces, group, remember, space_detect, select):
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
-    options = ['spaces', 'group', 'remember', 'space_detect', 'select']
+    options = ['spaces', 'group', 'remember', 'space_detect', 'select', 'newlines']
     updated_options = {}
     for option in options:
         if eval(option) is not None:              
@@ -304,6 +305,7 @@ def reset(configuration):
 @cli.command()
 # formatting options
 @click.option('--spaces', '-s', type=click.Choice(['remove', 'X', 'keep']), help='Set space handling preference')
+@click.option('--newlines', '-n', type=click.Choice(['True', 'False']), help='Include newline characters')
 @click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='Convert decrypted Xs to spaces')
 @click.option('--group', '-g', help='Set output letter grouping')
 # enigma setting options
@@ -323,7 +325,7 @@ def reset(configuration):
 @click.option('--output', '-o', type=click.File('w'), required=False, help="Path to output file")
 # arguments
 @click.argument('message', type=click.STRING, required=False)
-def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message, input, output, space_detect):
+def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, select, update, remember, message, input, output, space_detect, newlines):
     """
     Encrypts text input with Enigma Machine.  All input is converted to uppercase and non-alphabetic characters (with the exception
     of spaces and newline characters) are removed.  
@@ -363,7 +365,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # add preferences locally
     pref_options = {'spaces': spaces, 'group': group, 'remember': remember,
-                    'select': select, 'space_detect': space_detect}
+                    'select': select, 'space_detect': space_detect, 'newlines': newlines}
 
     preferences = update_config(preferences, pref_options)
 
@@ -397,16 +399,22 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # match preference options to local preferences
     spaces = preferences["spaces"]
-
+    newlines = preferences["newlines"]
     group = int(preferences["group"])
     remember = preferences["remember"]
     space_detect = preferences["space_detect"]  
 
     # ensure type
     space_detect = str_to_bool(space_detect)
+    newlines = str_to_bool(newlines)
 
+    # if input file used, overwrite message
     if message is None and input is not None:
-            message = input.read().replace('\n', ' ')
+        message = input.read()
+
+        # if newlines is True, treat newlines as spaces
+        if not newlines:
+            message = message.replace('\n', ' ')          
 
     # encrypt message
     ciphertext = _encrypt(enigma, message, spaces, space_detect, group)
@@ -487,10 +495,15 @@ def _encrypt(enigma, message, spaces, space_detect, group):
                 else:
                     ciphertext += " "
 
+            # if new line, keep it (if newlines undesired, it should have been replaced with space already)
+            elif ord(c) == 10:
+                ciphertext += '\n'
+
             # if character is illegal, remove it
             elif ord(c) < 65 or ord(c) > 90:
                 # do nothing (will not be entered into enigma)
                 pass
+
 
             # otherwise character is legal, encrypt it
             else:

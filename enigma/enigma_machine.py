@@ -158,17 +158,17 @@ class EnigmaMachine:
 
     def __reflector_check(self, reflect):
         """check for invalid reflector"""
-        if self.__model == "ENIGMAI" and not(reflect == "UKW-A" or
-                                             reflect == "UKW-B" or
-                                             reflect == "UKW-C"):
+        if self.__model.upper() == "ENIGMAI" and not(reflect.upper() == "UKW-A" or
+                                             reflect.upper() == "UKW-B" or
+                                             reflect.upper() == "UKW-C"):
 
             raise enigma_exception.InvalidReflector(self.__model)
 
-        elif self.__model == "M4" and not(reflect == "UKW-B_THIN" or
-                                          reflect == "UKW-C_THIN"):
+        elif self.__model == "M4" and not(reflect.upper() == "UKW-B_THIN" or
+                                          reflect.upper() == "UKW-C_THIN"):
             raise enigma_exception.InvalidReflector(self.__model)
 
-        elif (not (self.__model == "ENIGMAI" or self.__model == "M4") and
-              not (reflect == "UKW-B" or reflect == "UKW-C")):
+        elif (not (self.__model.upper() == "ENIGMAI" or self.__model == "M4") and
+              not (reflect.upper() == "UKW-B" or reflect.upper() == "UKW-C")):
 
             raise enigma_exception.InvalidReflector(self.__model)

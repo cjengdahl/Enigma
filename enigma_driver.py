@@ -52,7 +52,7 @@ def list(configuration):
     """
 
     if len(config.read(user_configs)) == 0:
-        click.echo("\nConfig file, \"config.ini\", not found\n")
+        click.echo("\nError: Config file, \"config.ini\", not found\n")
         return
 
     if configuration is not None:
@@ -61,7 +61,7 @@ def list(configuration):
             selected = load_config(configuration)
 
         except configparser.NoSectionError:
-            click.echo("Configuration %s could not be found" % configuration)
+            click.echo("Error: Configuration %s could not be found" % configuration)
             return
 
         sorted_config = []
@@ -120,7 +120,7 @@ def pref(spaces, group, remember, space_detect, select):
             selected = load_config("Preferences")
 
         except configparser.NoSectionError:
-            click.echo("Preferences could not be found")
+            click.echo("Error: Preferences could not be found")
             return
 
         preferences = []
@@ -172,23 +172,23 @@ def new(configuration, model, fast, middle, slow, static, reflect, plugs):
         enigma = assemble_enigma(local_config)
 
     except enigma_exception.DuplicatePlug:
-        click.echo("Cannot create configuration, duplicate plugs are not allowed")
+        click.echo("Error: Duplicate plugs are not allowed")
         return
     except enigma_exception.MaxPlugsReached:
-        click.echo("Cannot create configuration.  More plugs than allowed have been specified")
+        click.echo("Error: More plugs than allowed have been specified")
         return
     except enigma_exception.DuplicateRotor:
-        click.echo("Cannot create configuration, duplicate rotors are not allowed")
+        click.echo("Error: Duplicate rotors are not allowed")
         return
     except enigma_exception.InvalidRotor:
-        click.echo("Cannot create configuration, invalid rotor specified")
+        click.echo("Error: Invalid rotor specified")
         return
     except enigma_exception.InvalidRotorFour:
-        click.echo("Cannot create configuration, invalid static rotor specified.  "
+        click.echo("Error: Invalid static rotor specified.  "
                    "Must use rotor id 9 (Beta) or 10 (Gamma)")
         return
     except enigma_exception.InvalidReflector:
-        click.echo("Cannot create configuration, invalid reflector specified")
+        click.echo("Error: Invalid reflector specified")
         return
 
     # create new config and write local configuration to it
@@ -225,13 +225,13 @@ def delete(configuration):
     """
 
     if len(config.read(user_configs)) == 0:
-        click.echo("\nConfig file, \"config.ini\", not found\n")
+        click.echo("\nError: Config file, \"config.ini\", not found\n")
         return
 
     if configuration.upper() not in ['DEFAULT', 'USER']:
 
         if configuration.upper() == "PREFERENCES":
-            click.echo("\nConfiguration \"%s\" does not exist, cannot delete\n" % configuration)
+            click.echo("\nError: Configuration \"%s\" does not exist, cannot delete\n" % configuration)
             return
 
         # gather all configurations
@@ -239,14 +239,14 @@ def delete(configuration):
         sections = config.sections()
         
         if len(sections) == 3:
-            click.echo("\nConfiguration file contains no delete-able configurations\n")
+            click.echo("\nError: Configuration file contains no delete-able configurations\n")
             return
 
         for x in sections:
             configurations.append(x)
 
         if configuration not in configurations:
-            click.echo("Configuration \"%s\" does not exist, cannot delete" % configuration)
+            click.echo("Error: Configuration \"%s\" does not exist, cannot delete" % configuration)
 
         else:
             # remove config
@@ -260,7 +260,7 @@ def delete(configuration):
             with open(user_configs, 'w') as configfile:
                 config.write(configfile)
     else:
-        click.echo("\nCannot delete \"Default\" or \"User\" configurations\n")
+        click.echo("\nError: Cannot delete \"Default\" or \"User\" configurations\n")
 
 
 @cli.command()
@@ -271,7 +271,7 @@ def reset(configuration):
     """
 
     if len(config.read(user_configs)) == 0:
-        click.echo("\nConfig file, \"config.ini\", not found\n")
+        click.echo("\nError: Config file, \"config.ini\", not found\n")
         return
 
     if configuration.upper() != 'DEFAULT':
@@ -280,14 +280,14 @@ def reset(configuration):
         sections = config.sections()
         
         if len(sections) == 0:
-            click.echo("\nConfiguration file contains no configurations\n")
+            click.echo("\nError: Configuration file contains no configurations\n")
             return
 
         for x in sections:
             configurations.append(x.upper())
 
         if (configuration.upper() not in configurations) or configuration.upper() == "PREFERENCES":
-            click.echo("\nconfiguration \"%s\" does not exist, cannot reset\n" % configuration)
+            click.echo("\nError: Configuration \"%s\" does not exist, cannot reset\n" % configuration)
 
         else:
             config.remove_section(configuration)
@@ -298,7 +298,7 @@ def reset(configuration):
                 config.write(configfile)
 
     else:
-        click.echo("\nCannot reset \"Default\" configuration\n")
+        click.echo("\nError: Cannot reset \"Default\" configuration\n")
 
 
 @cli.command()
@@ -331,7 +331,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # get user configurations
     if len(config.read(user_configs)) == 0:
-        click.echo("\nConfig file, \"config.ini\", not found\n")
+        click.echo("\nError: Config file, \"config.ini\", not found\n")
         return
 
     # load preferences
@@ -339,7 +339,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
         preferences = load_config("Preferences")
 
     except configparser.NoSectionError:
-        click.echo("Preferences could not be found" % select)
+        click.echo("Error: Preferences could not be found" % select)
         return
 
     # load model
@@ -352,7 +352,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
         local_config = load_config(select)
 
     except configparser.NoSectionError:
-        click.echo("Configuration %s could not be found" % select)
+        click.echo("Error: Configuration %s could not be found" % select)
         return
 
     # add config changes locally
@@ -372,22 +372,22 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
         enigma = assemble_enigma(local_config)
 
     except enigma_exception.DuplicatePlug:
-        click.echo("Cannot create configuration, duplicate plugs are not allowed")
+        click.echo("Error: Duplicate plugs are not allowed")
         return
     except enigma_exception.MaxPlugsReached:
-        click.echo("Cannot create configuration.  More plugs than allowed have been specified")
+        click.echo("Error: More plugs than allowed have been specified")
         return
     except enigma_exception.DuplicateRotor:
-        click.echo("Cannot create configuration, duplicate rotors are not allowed")
+        click.echo("Error: Duplicate rotors are not allowed")
         return
     except enigma_exception.InvalidRotor:
-        click.echo("Cannot create configuration, invalid rotor specified")
+        click.echo("Error: Invalid rotor specified")
         return
     except enigma_exception.InvalidRotorFour:
-        click.echo("Cannot create configuration, invalid static rotor specified")
+        click.echo("Error: Invalid static rotor specified")
         return
     except enigma_exception.InvalidReflector:
-        click.echo("Cannot create configuration, invalid reflector specified, check model compatibility")
+        click.echo("Error: Invalid reflector specified, check model compatibility")
         return
 
     # if enigma assembled without error and update is specified, write config and preferences to config file
@@ -411,7 +411,6 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
     # encrypt message
     ciphertext = _encrypt(enigma, message, spaces, space_detect, group)
 
-    # todo: modify enigma_machine to report state
     # save state of machine for next use, if requested
     if str_to_bool(remember):
 

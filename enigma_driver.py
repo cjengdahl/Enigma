@@ -473,7 +473,7 @@ def _encrypt(enigma, message, spaces, space_detect, group):
     ciphertext = ""
     count = 0
 
-    with click.progressbar(plaintext) as bar:
+    with click.progressbar(plaintext, label="Encrypting", length = len(plaintext)) as bar:
         for c in bar:
 
         # for c in plaintext:

@@ -33,6 +33,7 @@ def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
     click.echo('Enigma Version %s' % __version__)
+    click.echo('Author: Cory J. Engdahl')
     ctx.exit()
 
 
@@ -91,9 +92,10 @@ def list(configuration):
 @click.option('--spaces', type=click.Choice(['remove', 'X', 'keep']), help='set default space handling preference')
 @click.option('--space-detect', '-d', type=click.Choice(['True', 'False']), help='enable space detection, decrypted Xs are converted to spaces.')
 @click.option('--group', type=click.STRING, help='set default letter grouping preference')
+@click.option('--select', help='configuration to load')
 @click.option('--remember', type=click.Choice(['True', 'False']),
               help='set enigma machine to remember machine state after encryption')
-def pref(spaces, group, remember, space_detect):
+def pref(spaces, group, remember, space_detect, select):
     """
     Lists the default preferences.  Invoked options updates preferences
     """
@@ -102,7 +104,7 @@ def pref(spaces, group, remember, space_detect):
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
-    options = ['spaces', 'group', 'remember', 'space_detect']
+    options = ['spaces', 'group', 'remember', 'space_detect', 'select']
     updated_options = {}
     for option in options:
         if eval(option) is not None:              
@@ -215,7 +217,7 @@ def clear():
             config.remove_section(x)
 
     # set config preference to User
-    config["Preferences"]["config"] = "User"
+    config["Preferences"]["select"] = "User"
 
     with open(user_configs, 'w') as configfile:
             config.write(configfile)
@@ -258,11 +260,11 @@ def delete(configuration):
             config.remove_section(configuration)
 
             # if config to be deleted is config preference
-            if config["Preferences"]["config"] == configuration:
+            if config["Preferences"]["select"] == configuration:
                 # update config preference to be User config
-                config["Preferences"]["config"] = "User"
+                config["Preferences"]["select"] = "User"
 
-            with open('user_configs', 'w') as configfile:
+            with open(user_configs, 'w') as configfile:
                 config.write(configfile)
     else:
         click.echo("\nCannot delete \"Default\" or \"User\" configurations\n")
@@ -354,7 +356,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
         if select is None:
             # load config in preferences
-            select = preferences["config"]
+            select = preferences["select"]
 
         local_config = load_config(select)
 
@@ -370,7 +372,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 
     # add preferences locally
     pref_options = {'spaces': spaces, 'group': group, 'remember': remember,
-                    'config': select, 'space_detect': space_detect}
+                    'select': select, 'space_detect': space_detect}
 
     preferences = update_config(preferences, pref_options)
 
@@ -472,43 +474,47 @@ def _encrypt(enigma, message, spaces, space_detect, group):
     plaintext = message.upper()
     ciphertext = ""
     count = 0
-    for c in plaintext:
 
-        # if character is a space
-        if ord(c) == 32:
+    with click.progressbar(plaintext) as bar:
+        for c in bar:
 
-            # and option is set to remove
-            if spaces.lower() == 'remove':
+        # for c in plaintext:
+
+            # if character is a space
+            if ord(c) == 32:
+
+                # and option is set to remove
+                if spaces.lower() == 'remove':
+                    # do nothing (will not be entered into enigma)
+                    pass
+
+                # and option is set to 'X
+                elif spaces.lower() == 'x':
+                    # replace the space with the character 'X' and encrypt
+                    ciphertext += enigma.encrypt('X')
+
+                # otherwise, the space will be evident in the cipher text
+                else:
+                    ciphertext += " "
+
+            # if character is illegal, remove it
+            elif ord(c) < 65 or ord(c) > 90:
                 # do nothing (will not be entered into enigma)
                 pass
 
-            # and option is set to 'X
-            elif spaces.lower() == 'x':
-                # replace the space with the character 'X' and encrypt
-                ciphertext += enigma.encrypt('X')
-
-            # otherwise, the space will be evident in the cipher text
+            # otherwise character is legal, encrypt it
             else:
-                ciphertext += " "
-
-        # if character is illegal, remove it
-        elif ord(c) < 65 or ord(c) > 90:
-            # do nothing (will not be entered into enigma)
-            pass
-
-        # otherwise character is legal, encrypt it
-        else:
-            e = enigma.encrypt(c)
-            # if space detect enabled, replaces Xs with spaces
-            if space_detect and e == 'X':
-                ciphertext += " "
-            else:
-                ciphertext += e
-            if group != 0:
-                count = (count + 1) % group
-                # if not keeping spaces, group characters for readability
-                if spaces.lower() != 'keep' and count == 0:
+                e = enigma.encrypt(c)
+                # if space detect enabled, replaces Xs with spaces
+                if space_detect and e == 'X':
                     ciphertext += " "
+                else:
+                    ciphertext += e
+                if group != 0:
+                    count = (count + 1) % group
+                    # if not keeping spaces, group characters for readability
+                    if spaces.lower() != 'keep' and count == 0:
+                        ciphertext += " "
     return ciphertext
 
 

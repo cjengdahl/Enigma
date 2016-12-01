@@ -1,2 +1,2 @@
-recursive-include enigma/enigma *.ini
-recursive-include enigma/config *.ini
+recursive-include enigma/*.ini
+recursive-include config/*.ini

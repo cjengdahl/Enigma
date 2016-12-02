@@ -35,6 +35,9 @@ setup(
     install_requires=[
         'Click',
     ],
+    
+    # Required config files
+    data_files=[('', ['config/config.ini', 'engima/model.ini'])],
 
     # Executable information
     entry_points='''

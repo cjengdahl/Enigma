@@ -37,7 +37,9 @@ setup(
     ],
     
     # Required config files
-    data_files=[('', ['engima/model.ini'])],
+    # data_files=[('', ['engima/model.ini'])],
+    
+    package_data={'enigma': ['*.ini']},
 
     # Executable information
     entry_points='''

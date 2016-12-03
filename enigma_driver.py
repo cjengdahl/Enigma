@@ -14,7 +14,7 @@ config = configparser.ConfigParser(interpolation=configparser.
                                    ExtendedInterpolation())
 
 pwd = os.path.dirname(__file__)
-user_configs = os.path.join(pwd, 'config/config.ini')
+user_configs = os.path.join(pwd, 'enigma/config.ini')
 
 
 class DecryptAlias(click.Group):

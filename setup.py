@@ -25,11 +25,11 @@ setup(
     # Details
     # Put pypi url here
 
-    license="LICENSE.txt",
+    license="LICENSE",
 
     description="German Encryption Machine",
 
-    long_description=open("README.txt").read(),
+    long_description=open("README.md").read(),
 
     # Dependent packages
     install_requires=[

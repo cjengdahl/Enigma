@@ -25,7 +25,21 @@ setup(
     # Details
     # Put pypi url here
 
-    license="LICENSE",
+    license="MIT",
+    
+    classifiers=[
+    'Development Status :: 5 - Production/Stable',
+
+    # Indicate who your project is intended for
+    'Intended Audience :: Enigma Enthusiasts',
+
+    # Pick your license as you wish (should match "license" above)
+    'License :: OSI Approved :: MIT License',
+
+    # Not compatible with Python2
+    'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
+    ],
 
     description="German Encryption Machine",
 

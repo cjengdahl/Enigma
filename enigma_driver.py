@@ -33,7 +33,6 @@ def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
     click.echo('Enigma Version %s' % __version__)
-    click.echo('Author: Cory J. Engdahl')
     ctx.exit()
 
 

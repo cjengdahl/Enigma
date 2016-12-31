@@ -31,7 +31,7 @@ setup(
     'Development Status :: 5 - Production/Stable',
 
     # Indicate who your project is intended for
-    'Intended Audience :: Enigma Enthusiasts',
+    'Intended Audience :: Other Audience',
 
     # Pick your license as you wish (should match "license" above)
     'License :: OSI Approved :: MIT License',
@@ -43,7 +43,7 @@ setup(
 
     description="German Encryption Machine",
 
-    long_description=open("README.md").read(),
+    long_description=open("README.rst").read(),
 
     # Dependent packages
     install_requires=[

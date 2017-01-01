@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
 
     # Application name
-    name='EnigmaMachine',
+    name='enigma',
 
     # Version Number
     version="0.1.0",
@@ -41,7 +41,7 @@ setup(
     'Programming Language :: Python :: 3.5',
     ],
 
-    description="German Encryption Machine",
+    description="German Cipher Command-Line Tool",
 
     long_description=open("README.rst").read(),
 

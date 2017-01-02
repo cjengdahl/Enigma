@@ -26,7 +26,7 @@ enigma requires the installation of the python3_ interpreter.  The only third-pa
 
 |  **Install with pip:**
 
-|  ``pip install enigma``
+|  ``pip install enigma-cli``
 
 The source can be cloned from https://github.com/cjengdahl/Enigma
 

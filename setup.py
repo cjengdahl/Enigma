@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
 
     # Application name
-    name='enigma',
+    name='enigma-cli',
 
     # Version Number
     version="0.1.0",

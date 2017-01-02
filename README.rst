@@ -1,6 +1,6 @@
-======
-enigma
-======
+==========
+enigma-cli
+==========
 
 :Author: Cory J. Engdahl
 :Email: cjengdahl@gmail.com

@@ -94,7 +94,8 @@ def list(configuration):
 @click.option('--group', '-g', type=click.STRING, help='Set output letter grouping')
 @click.option('--select', '-c', help='Select enigma machine configuration')
 @click.option('--remember', '-k', type=click.Choice(['True', 'False']), help='Remember machine state after encryption')
-def pref(spaces, group, remember, space_detect, select, newlines):
+@click.option('--progress', '-p', type=click.Choice(['True', 'False']), help="Show progressbar")
+def pref(spaces, group, remember, space_detect, select, newlines, progress):
     """
     Manages the default preferences.  Invoked options updates preferences
     """
@@ -103,7 +104,7 @@ def pref(spaces, group, remember, space_detect, select, newlines):
         click.echo("\nConfig file, \"config.ini\", not found\n")
         return
 
-    options = ['spaces', 'group', 'remember', 'space_detect', 'select', 'newlines']
+    options = ['spaces', 'group', 'remember', 'space_detect', 'select', 'newlines', 'progress']
     updated_options = {}
     for option in options:
         if eval(option) is not None:              
@@ -401,11 +402,13 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
     newlines = preferences["newlines"]
     group = int(preferences["group"])
     remember = preferences["remember"]
-    space_detect = preferences["space_detect"]  
+    space_detect = preferences["space_detect"]
+    progress = preferences["progress"]
 
     # ensure type
     space_detect = str_to_bool(space_detect)
     newlines = str_to_bool(newlines)
+    progress = str_to_bool(progress)
 
     # if input file used, overwrite message
     if message is None and input is not None:
@@ -416,7 +419,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
             message = message.replace('\n', ' ')          
 
     # encrypt message
-    ciphertext = _encrypt(enigma, message, spaces, space_detect, group)
+    ciphertext = _encrypt(enigma, message, spaces, space_detect, group, progress)
 
     # save state of machine for next use, if requested
     if str_to_bool(remember):
@@ -448,7 +451,7 @@ def encrypt(spaces, group, model, fast, middle, slow, static, reflect, plugs, se
 ##################################
 
 
-def _encrypt(enigma, message, spaces, space_detect, group):
+def _encrypt(enigma, message, spaces, space_detect, group, progress):
     """
     Encrypts input and directs output appropriately, with standard-out as
     the default. It also controls output format.  By default, characters
@@ -472,10 +475,58 @@ def _encrypt(enigma, message, spaces, space_detect, group):
     ciphertext = ""
     count = 0
 
-    with click.progressbar(plaintext, label="Encrypting", length = len(plaintext)) as bar:
-        for c in bar:
 
-        # for c in plaintext:
+    if not progress:
+
+        with click.progressbar(plaintext, label="Encrypting", length = len(plaintext)) as bar:
+            for c in bar:
+
+            # for c in plaintext:
+
+                # if character is a space
+                if ord(c) == 32:
+
+                    # and option is set to remove
+                    if spaces.lower() == 'remove':
+                        # do nothing (will not be entered into enigma)
+                        pass
+
+                    # and option is set to 'X
+                    elif spaces.lower() == 'x':
+                        # replace the space with the character 'X' and encrypt
+                        ciphertext += enigma.encrypt('X')
+
+                    # otherwise, the space will be evident in the cipher text
+                    else:
+                        ciphertext += " "
+
+                # if new line, keep it (if newlines undesired, it should have been replaced with space already)
+                elif ord(c) == 10:
+                    ciphertext += '\n'
+
+                # if character is illegal, remove it
+                elif ord(c) < 65 or ord(c) > 90:
+                    # do nothing (will not be entered into enigma)
+                    pass
+
+
+                # otherwise character is legal, encrypt it
+                else:
+                    e = enigma.encrypt(c)
+                    # if space detect enabled, replaces Xs with spaces
+                    if space_detect and e == 'X':
+                        ciphertext += " "
+                    else:
+                        ciphertext += e
+                    if group != 0:
+                        count = (count + 1) % group
+                        # if not keeping spaces, group characters for readability
+                        if spaces.lower() != 'keep' and count == 0:
+                            ciphertext += " "
+
+    else:
+
+        for c in plaintext:
 
             # if character is a space
             if ord(c) == 32:
@@ -517,6 +568,8 @@ def _encrypt(enigma, message, spaces, space_detect, group):
                     # if not keeping spaces, group characters for readability
                     if spaces.lower() != 'keep' and count == 0:
                         ciphertext += " "
+
+
     return ciphertext
 
 

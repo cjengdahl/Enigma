@@ -48,7 +48,7 @@ that the following items are specified before use:
 Preferences
 -----------
 
-In addition to the machine configuration, there are also user preferences that can be set. These include output grouping, newline removal, space handling, space detection, default configuration, and state remembrance.
+In addition to the machine configuration, there are also user preferences that can be set. These include output grouping, newline removal, space handling, space detection, default configuration, state remembrance, and progressbar inclusion.
 
 | * **Output grouping** groups the output text to the specified number of characters.  Historically, messages where separated by a space every five characters.  This preference is ignored if the space handling preference is set to 'keep'.
 
@@ -60,7 +60,9 @@ In addition to the machine configuration, there are also user preferences that c
 
 | * The **default configuration** is the configuration that will be loaded automatically every time an enigma command is executed.  By default, the "User" configuration is loaded; however, addition configurations can be specified.
 
-| * Lastly, the enigma can be placed in a **state of remembrance**.  With this enabled, for each character encrypted/decrypted the state of the machine is saved the nexted use (i.e. the rotor positions are saved after use)
+| * The enigma can be placed in a **state of remembrance**.  With this enabled, for each character encrypted/decrypted the state of the machine is saved the nexted use (i.e. the rotor positions are saved after use)
+
+| * Lastly, the command line can incldue a **progressbar** while encrypting or decrypting to show the elapsed progress)
 
 
 Usage
@@ -174,6 +176,8 @@ Manages the default preferences.  Invoked options updates preferences
     ``-c, --select TEXT``                     Select enigma machine configuration
 
     ``-k, --remember [True | False]``         Remember machine state after encryption
+
+    ``-p, --progess [True | False]``          Show progressbar
     =====================================     ========================================
 
 

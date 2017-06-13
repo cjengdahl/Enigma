@@ -50,7 +50,7 @@ Preferences
 
 In addition to the machine configuration, there are also user preferences that can be set. These include output grouping, newline removal, space handling, space detection, default configuration, state remembrance, and progressbar inclusion.
 
-Detailed configuration description:
+Detailed preference description:
 
 - **Output grouping** groups the output text to the specified number of characters.  Historically, messages where separated by a space every five characters.  This preference is ignored if the space handling preference is set to 'keep' or 'X'.
 

@@ -1,6 +1,6 @@
 __author__ = "Cory J. Engdahl"
 __license__ = "MIT"
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __email__ = "cjengdahl@gmail.com"
 
 from enigma import enigma_machine

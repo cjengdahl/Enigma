@@ -37,12 +37,12 @@ Just like an actual Enigma Machine, the simulated machine must be configured bef
 serves as the 'key'.  The same key is used to encrypt and decrypt text. The setup configurations are stored in a config file, which can be modified through the command line interface.  A default configuration is always available, along with a single, modifiable user configuration named 'User'.  It is required
 that the following items are specified before use:
 
-| * Enigma Model
-| * Rotors Used (ID)
-| * Rotor Start Postions
-| * Rotor Ring Postions 
-| * Reflector
-| * Plugs Inserted In Plugboard
+* Enigma Model
+* Rotors Used (ID)
+* Rotor Start Postions
+* Rotor Ring Postions 
+* Reflector
+* Plugs Inserted In Plugboard
 
 
 Preferences
@@ -50,19 +50,21 @@ Preferences
 
 In addition to the machine configuration, there are also user preferences that can be set. These include output grouping, newline removal, space handling, space detection, default configuration, state remembrance, and progressbar inclusion.
 
-| * **Output grouping** groups the output text to the specified number of characters.  Historically, messages where separated by a space every five characters.  This preference is ignored if the space handling preference is set to 'keep'.
+Detailed configuration description:
 
-| * **Newline removal** replaces newline characters with a space.  This is only applicable to file input, not encrypting directly from standard input.  
+- **Output grouping** groups the output text to the specified number of characters.  Historically, messages where separated by a space every five characters.  This preference is ignored if the space handling preference is set to 'keep' or 'X'.
 
-| * **Space handling** allows the user to specify if spaces should be kept in the cipher text, removed, or replaced with an "X" before encryption.  Historically, it was common to replace spaces with an "X" because the character itself was not commonly used.  
+* **Newline removal** replaces newline characters with a space.  This is only applicable to file input, not encrypting directly from standard input.  
 
-| * **Space detection** goes hand in hand with the space replacement.  During the decryption process, if an "X" is found, it is replaced with a space. 
+- **Space handling** allows the user to specify if spaces should be kept in the cipher text, removed, or replaced with an "X" before encryption.  Historically, it was common to replace spaces with an "X" because the character itself was not commonly used.  
 
-| * The **default configuration** is the configuration that will be loaded automatically every time an enigma command is executed.  By default, the "User" configuration is loaded; however, addition configurations can be specified.
+* **Space detection** goes hand in hand with the space replacement.  During the decryption process, if an "X" is found, it is replaced with a space. 
 
-| * The enigma can be placed in a **state of remembrance**.  With this enabled, for each character encrypted/decrypted the state of the machine is saved the nexted use (i.e. the rotor positions are saved after use)
+- The **default configuration** is the configuration that will be loaded automatically every time an enigma command is executed.  By default, the "User" configuration is loaded; however, addition configurations can be specified.
 
-| * Lastly, the command line can incldue a **progressbar** while encrypting or decrypting to show the elapsed progress)
+* The enigma can be placed in a **state of remembrance**.  With this enabled, for each character encrypted/decrypted the state of the machine is saved the nexted use (i.e. the rotor positions are saved after use)
+
+- Lastly, the command line can include a **progressbar** while encrypting or decrypting to show the elapsed progress)
 
 
 Usage

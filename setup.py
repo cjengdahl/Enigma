@@ -7,7 +7,7 @@ setup(
     name='enigma-cli',
 
     # Version Number
-    version="0.1.2",
+    version="0.1.3",
 
     # Author details
     author='cjengdahl',
@@ -41,7 +41,7 @@ setup(
     'Programming Language :: Python :: 3.5',
     ],
 
-    description="German Cipher Command-Line Tool",
+    description="German Cipher Machine Command-Line Tool",
 
     long_description=open("README.rst").read(),
 

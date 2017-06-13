@@ -1,6 +1,6 @@
 __author__ = "Cory J. Engdahl"
 __license__ = "MIT"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __email__ = "cjengdahl@gmail.com"
 
 from enigma import enigma_machine
@@ -461,12 +461,10 @@ def _encrypt(enigma, message, spaces, space_detect, group, progress):
     :return:
     """
 
-    # todo:  notification of some sort....
-
     # if space_detect, remove all spaces for processing
     if space_detect:
-        spaces = "remove"
         group = 0
+        spaces = "remove"
 
     if message is None:
         return
@@ -476,7 +474,7 @@ def _encrypt(enigma, message, spaces, space_detect, group, progress):
     count = 0
 
 
-    if not progress:
+    if progress:
 
         with click.progressbar(plaintext, label="Encrypting", length = len(plaintext)) as bar:
             for c in bar:
@@ -509,7 +507,6 @@ def _encrypt(enigma, message, spaces, space_detect, group, progress):
                     # do nothing (will not be entered into enigma)
                     pass
 
-
                 # otherwise character is legal, encrypt it
                 else:
                     e = enigma.encrypt(c)
@@ -520,8 +517,8 @@ def _encrypt(enigma, message, spaces, space_detect, group, progress):
                         ciphertext += e
                     if group != 0:
                         count = (count + 1) % group
-                        # if not keeping spaces, group characters for readability
-                        if spaces.lower() != 'keep' and count == 0:
+                        # if not keeping/replacing spaces, group characters for readability
+                        if spaces.lower() == 'remove' and count == 0:
                             ciphertext += " "
 
     else:

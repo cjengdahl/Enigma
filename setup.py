@@ -7,7 +7,7 @@ setup(
     name='enigma-cli',
 
     # Version Number
-    version="0.1.4",
+    version="1.0.0",
 
     # Author details
     author='cjengdahl',

@@ -562,8 +562,8 @@ def _encrypt(enigma, message, spaces, space_detect, group, progress):
                     ciphertext += e
                 if group != 0:
                     count = (count + 1) % group
-                    # if not keeping spaces, group characters for readability
-                    if spaces.lower() != 'keep' and count == 0:
+                    # if not keeping/replacing spaces, group characters for readability
+                    if spaces.lower() == 'remove' and count == 0:
                         ciphertext += " "
 
 
